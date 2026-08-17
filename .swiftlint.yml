@@ -1,0 +1,25 @@
+included:
+  - MLCodeChallenge
+  - MLCodeChallengeTests
+
+opt_in_rules:
+  - empty_count
+  - force_unwrapping
+  - first_where
+  - unused_import
+  - redundant_nil_coalescing
+  - closure_spacing
+
+line_length:
+  warning: 140
+  error: 180
+
+file_length:
+  warning: 400
+
+type_body_length:
+  warning: 250
+
+identifier_name:
+  min_length: 2
+  excluded: [id, x, y]
