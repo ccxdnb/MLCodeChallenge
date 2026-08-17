@@ -16,6 +16,16 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .padding()
+        .task {
+            do {
+                let client = HTTPClient()
+                let users: [User] = try await client.execute(UsersAPI.users)
+                print("✅ \(users.count) users")
+                print(users as Any)
+            } catch {
+                print("❌ \(error)")
+            }
+        }
     }
 }
 

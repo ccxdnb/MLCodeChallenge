@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct Geo: Codable, Equatable, Sendable {
+nonisolated struct Geo: Codable, Equatable, Sendable {
     let latitude: Double
     let longitude: Double
 
@@ -28,6 +28,11 @@ struct Geo: Codable, Equatable, Sendable {
 
         self.latitude = lat
         self.longitude = lng
+    }
+
+    init(latitude: Double, longitude: Double) {
+        self.latitude = latitude
+        self.longitude = longitude
     }
 
     func encode(to encoder: Encoder) throws {

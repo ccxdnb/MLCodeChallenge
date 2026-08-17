@@ -29,6 +29,17 @@
 		9491113A302FB5AF0024F000 /* MLCodeChallengeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MLCodeChallengeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		94911A5A3033C8AA0024F000 /* Exceptions for "MLCodeChallengeUITests" folder in "MLCodeChallengeUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				MLCodeChallengeUITests.swift,
+				MLCodeChallengeUITestsLaunchTests.swift,
+			);
+			target = 94911139302FB5AF0024F000 /* MLCodeChallengeUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		94911125302FB5AD0024F000 /* MLCodeChallenge */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -42,6 +53,9 @@
 		};
 		9491113D302FB5AF0024F000 /* MLCodeChallengeUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				94911A5A3033C8AA0024F000 /* Exceptions for "MLCodeChallengeUITests" folder in "MLCodeChallengeUITests" target */,
+			);
 			path = MLCodeChallengeUITests;
 			sourceTree = "<group>";
 		};

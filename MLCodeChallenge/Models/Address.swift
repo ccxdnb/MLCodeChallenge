@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct Address: Codable, Sendable {
+nonisolated struct Address: Codable, Sendable, Equatable {
     let street: String
     let suite: String
     let city: String

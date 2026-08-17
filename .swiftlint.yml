@@ -6,9 +6,11 @@ opt_in_rules:
   - empty_count
   - force_unwrapping
   - first_where
-  - unused_import
   - redundant_nil_coalescing
   - closure_spacing
+
+analyzer_rules:
+  - unused_import
 
 line_length:
   warning: 140

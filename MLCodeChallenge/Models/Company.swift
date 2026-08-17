@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct Company: Codable, Sendable {
+nonisolated struct Company: Codable, Sendable, Equatable {
     let name: String
     let catchPhrase: String
     let bs: String
