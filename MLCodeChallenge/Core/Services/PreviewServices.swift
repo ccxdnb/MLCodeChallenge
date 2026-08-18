@@ -66,7 +66,7 @@ final class PreviewUsersService: UsersServiceProtocol {
             )
         }
     }
-    
+
     func deleteUser(userId: Int) async throws {}
 }
 #endif

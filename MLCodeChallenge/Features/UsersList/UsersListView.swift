@@ -57,6 +57,7 @@ extension UsersListView {
             case .loaded:
                 loadedContent
                     .transition(.opacity)
+                    .animation(.smooth(duration: 0.25), value: viewModel.filteredUsers.isEmpty)
 
             case .idle:
                 Color.clear
@@ -75,15 +76,12 @@ extension UsersListView {
 
     @ViewBuilder
     private var loadedContent: some View {
-        Group {
-            if viewModel.filteredUsers.isEmpty && !viewModel.searchText.isEmpty {
-                ContentUnavailableView.search(text: viewModel.searchText)
-                    .transition(.opacity)
-            } else {
-                userListView(users: viewModel.filteredUsers)
-            }
+        if viewModel.filteredUsers.isEmpty && !viewModel.searchText.isEmpty {
+            ContentUnavailableView.search(text: viewModel.searchText)
+                .transition(.opacity)
+        } else {
+            userListView(users: viewModel.filteredUsers)
         }
-        .animation(.smooth(duration: 0.25), value: viewModel.filteredUsers.isEmpty)
     }
 
     @ViewBuilder

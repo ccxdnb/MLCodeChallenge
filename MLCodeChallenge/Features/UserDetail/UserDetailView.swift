@@ -93,7 +93,7 @@ struct UserDetailView: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemBackground))
+                    .fill(Color(.secondarySystemGroupedBackground))
                     .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
             )
         }
@@ -119,7 +119,7 @@ private struct DetailSection<Content: View>: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemBackground))
+                    .fill(Color(.secondarySystemGroupedBackground))
                     .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
             )
         }.frame(maxWidth: .infinity)

@@ -13,6 +13,7 @@ private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge"
 struct AppRootView: View {
     @State private var coordinator = AppCoordinator()
     @State private var factory: ViewModelFactory
+    @State private var showClearCacheConfirmation = false
     private let imageLoader: ImageLoader
 
     init(
@@ -36,23 +37,29 @@ struct AppRootView: View {
     var body: some View {
         NavigationStack(path: $coordinator.path) {
             UsersListView(viewModel: factory.makeUsersListViewModel())
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            imageLoader.flush()
-                        } label: {
-                            Label("Clear Cache", systemImage: "trash")
-                        }
-                    }
-                }
                 .navigationDestination(for: Route.self) { route in
                     self.destinationFor(route)
                 }
         }
+        .onShake {
+            showClearCacheConfirmation = true
+        }
+        .alert("Clear Image Cache", isPresented: $showClearCacheConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Clear", role: .destructive) {
+                Task {
+                    await imageLoader.flush()
+                }
+            }
+        } message: {
+            Text("Are you sure you want to clear the image cache? This will remove all cached images.")
+        }
         .onReceive(NotificationCenter.default.publisher(
             for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
                 logger.debug("Memory warning received via NotificationCenter!")
-                imageLoader.flush()
+                Task {
+                    await imageLoader.flush()
+                }
                 URLCache.shared.removeAllCachedResponses()
         }
     }

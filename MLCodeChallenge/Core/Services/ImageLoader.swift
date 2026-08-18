@@ -19,20 +19,20 @@ actor ImageLoader {
     func loadImage(from url: URL, targetSize: CGSize, scale: CGFloat) async throws -> UIImage {
         let cacheKey = cacheKey(url: url, size: targetSize, scale: scale)
 
-        if let decoded = cache.decodedImage(for: cacheKey) {
+        if let decoded = await cache.decodedImage(for: cacheKey) {
             return decoded
         }
 
-        if let compressed = cache.compressedImage(for: url.absoluteString) {
+        if let compressed = await cache.compressedImage(for: url.absoluteString) {
             let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
-            cache.setDecoded(decoded, for: cacheKey)
+            await cache.setDecoded(decoded, for: cacheKey)
             return decoded
         }
 
         if let existingTask = inFlightTasks[url.absoluteString] {
             let compressed = try await existingTask.value
             let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
-            cache.setDecoded(decoded, for: cacheKey)
+            await cache.setDecoded(decoded, for: cacheKey)
             return decoded
         }
 
@@ -50,10 +50,10 @@ actor ImageLoader {
             let compressed = try await task.value
             inFlightTasks.removeValue(forKey: url.absoluteString)
 
-            cache.setCompressed(compressed, for: url.absoluteString)
+            await cache.setCompressed(compressed, for: url.absoluteString)
 
             let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
-            cache.setDecoded(decoded, for: cacheKey)
+            await cache.setDecoded(decoded, for: cacheKey)
 
             return decoded
         } catch {
@@ -105,14 +105,14 @@ actor ImageLoader {
         return decodedImage
     }
 
-    func flush() {
-        cache.clear()
+    func flush() async {
+        await cache.clear()
         inFlightTasks.values.forEach { $0.cancel() }
         inFlightTasks.removeAll()
     }
 
-    func flushDecoded() {
-        cache.clearDecoded()
+    func flushDecoded() async {
+        await cache.clearDecoded()
     }
 }
 

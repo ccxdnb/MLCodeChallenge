@@ -16,7 +16,7 @@ struct AlbumCardItem: View {
             // Background image
             if let photo = coverPhoto {
                 CachedAsyncImage(
-                    url: photo.bannerURL,
+                    url: photo.thumbnailURL,
                     targetSize: CGSize(width: 150, height: 150),
                     imageLoader: viewModel.dependencies.imageLoader
                 ) { image in

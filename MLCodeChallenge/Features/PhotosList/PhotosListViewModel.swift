@@ -73,7 +73,7 @@ final class PhotosListViewModel {
         guard initialLoadTask == nil else {
             return
         }
-        
+
         guard case .loaded(var paginationState) = state,
               !paginationState.isLoadingMore,
               !paginationState.hasReachedEnd else {
@@ -81,7 +81,7 @@ final class PhotosListViewModel {
         }
 
         paginationTask?.cancel()
-        
+
         // Set isLoadingMore synchronously BEFORE the Task suspension point
         // to prevent race condition from duplicate calls
         paginationState.isLoadingMore = true

@@ -15,23 +15,27 @@ struct PhotoRow: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 CachedAsyncImage(
-                    url: photo.fullSizeURL,
-                    targetSize: CGSize(width: 500, height: 500),
+                    url: photo.bannerURL,
+                    targetSize: CGSize(width: 533, height: 300),
                     imageLoader: imageLoader
                 ) { image in
                     image
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 300)
                 } placeholder: {
                     Rectangle()
-                        .fill(Color(.systemGray5))
+                        .fill(Color.clear)
                         .overlay {
                             ProgressView()
                         }
-                        .frame(minHeight: 400)
+                        .frame(height: 300)
                 }
+                .frame(height: 300)
+                .clipped()
                 .onTapGesture(perform: onTap)
             }
         }
+        .id(photo.id)
     }
 }

@@ -49,6 +49,13 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             return
         }
 
+        // Only reset to empty if we don't already have a success state
+        if case .success = phase {
+            // Keep the current image while loading
+        } else {
+            phase = .empty
+        }
+
         let scale = UITraitCollection.current.displayScale
 
         do {
