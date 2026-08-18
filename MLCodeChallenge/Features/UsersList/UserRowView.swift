@@ -27,7 +27,7 @@ struct UserRowView: View {
             }
 
             Spacer()
-            
+
             actionButtons
         }
         .padding(16)
