@@ -10,28 +10,25 @@ import SwiftUI
 struct UserRowView: View {
     let user: User
     let coordinator: AppCoordinatorProtocol
-
+    
     var body: some View {
         HStack(spacing: 12) {
-            // User info section
             VStack(alignment: .leading, spacing: 4) {
                 Text(user.name)
                     .font(.headline)
-
+                
                 Text("@\(user.username)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-
+                
                 Text(user.company.name)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
+            
             Spacer()
-
-            // Action buttons
+            
             HStack(spacing: 8) {
-                // Phone button
                 if let phoneURL = URL(string: "tel:\(user.phone)") {
                     Link(destination: phoneURL) {
                         Image(systemName: "phone.fill")
@@ -63,8 +60,7 @@ struct UserRowView: View {
                     }
                     .buttonStyle(.plain)
                 }
-
-                // Email button
+                
                 if let mailURL = URL(string: "mailto:\(user.email)") {
                     Link(destination: mailURL) {
                         Image(systemName: "envelope.fill")
@@ -97,7 +93,6 @@ struct UserRowView: View {
                     .buttonStyle(.plain)
                 }
 
-                // Map button
                 Button {
                     coordinator.pushTo(.map(user))
                 } label: {
@@ -121,6 +116,12 @@ struct UserRowView: View {
             }
         }
         .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        )
+        .padding()
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
     }
