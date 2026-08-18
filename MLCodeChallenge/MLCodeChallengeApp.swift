@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct MLCodeChallengeApp: App {
+    private let usersService = UsersService(client: HTTPClient())
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRootView(usersService: usersService)
         }
     }
 }

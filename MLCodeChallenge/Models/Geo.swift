@@ -6,7 +6,7 @@
 //
 import Foundation
 
-nonisolated struct Geo: Codable, Equatable, Sendable {
+nonisolated struct Geo: Codable, Equatable, Sendable, Hashable {
     let latitude: Double
     let longitude: Double
 

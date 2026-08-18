@@ -9,20 +9,21 @@ import Testing
 import Foundation
 @testable import MLCodeChallenge
 
+@Suite("Geo")
 struct GeoTests {
     @Test("Decodes string coordinates into Double")
     func decodesValidCoordinates() throws {
         let geo = try JSONDecoder().decode(
             Geo.self,
-            from: Data(#"{"lat": "40.7128", "lng": "-74.0060"}"#.utf8)
+            from: Data(#"{"lat": "1.1234", "lng": "-2.4321"}"#.utf8)
         )
-        #expect(geo.latitude == 40.7128)
-        #expect(geo.longitude == -74.0060)
+        #expect(geo.latitude == 1.1234)
+        #expect(geo.longitude == -2.4321)
     }
 
     @Test("Throws on non-numeric coordinates", arguments: [
-        #"{"lat": "invalid", "lng": "-74.0060"}"#,
-        #"{"lat": "40.7128", "lng": "not-a-number"}"#,
+        #"{"lat": "wrong", "lng": "-74.0060"}"#,
+        #"{"lat": "40.7128", "lng": "wrong"}"#,
         #"{"lat": "", "lng": "-74.0060"}"#
     ])
     func throwsOnInvalidCoordinates(json: String) {
