@@ -10,24 +10,24 @@ import SwiftUI
 struct UserRowView: View {
     let user: User
     let coordinator: AppCoordinatorProtocol
-    
+
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(user.name)
                     .font(.headline)
-                
+
                 Text("@\(user.username)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                
+
                 Text(user.company.name)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            
+
             Spacer()
-            
+
             HStack(spacing: 8) {
                 if let phoneURL = URL(string: "tel:\(user.phone)") {
                     Link(destination: phoneURL) {
@@ -60,7 +60,7 @@ struct UserRowView: View {
                     }
                     .buttonStyle(.plain)
                 }
-                
+
                 if let mailURL = URL(string: "mailto:\(user.email)") {
                     Link(destination: mailURL) {
                         Image(systemName: "envelope.fill")
