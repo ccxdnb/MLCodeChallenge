@@ -1,5 +1,5 @@
 //
-//  FullscreenPhotoView.swift
+//  PhotosListViewModel.swift
 //  MLCodeChallenge
 //
 //  Created by Joaquin Wilson on 8/18/26.
@@ -24,8 +24,9 @@ final class PhotosListViewModel {
     }
 
     private(set) var state: ViewState<PaginationState> = .idle
-    private var loadTask: Task<Void, Never>?
-    let dependencies: Dependencies
+    private var initialLoadTask: Task<Void, Never>?
+    private var paginationTask: Task<Void, Never>?
+    private let dependencies: Dependencies
     private let pageSize = 20
 
     var selectedPhoto: Photo?
@@ -35,55 +36,73 @@ final class PhotosListViewModel {
     }
 
     deinit {
-        loadTask?.cancel()
+        initialLoadTask?.cancel()
+        paginationTask?.cancel()
     }
 
     func loadInitial() async {
-        loadTask?.cancel()
+        initialLoadTask?.cancel()
 
         state = .loading
 
-        loadTask = Task {
-            await fetchPage(1, isInitial: true)
+        initialLoadTask = Task {
+            await fetchPage(1)
         }
 
-        await loadTask?.value
+        await initialLoadTask?.value
+        initialLoadTask = nil
     }
 
     func refresh() async {
-        loadTask?.cancel()
+        initialLoadTask?.cancel()
 
-        loadTask = Task {
-            await fetchPage(1, isInitial: true)
+        // If state is not .loaded, treat refresh like initial load
+        if case .loaded = state {
+            initialLoadTask = Task {
+                await fetchPage(1)
+            }
+            await initialLoadTask?.value
+            initialLoadTask = nil
+        } else {
+            await loadInitial()
         }
-
-        await loadTask?.value
     }
 
     func loadNextPageIfNeeded() {
-        guard case .loaded(let paginationState) = state,
+        // Ignore pagination requests while initial load is in flight
+        guard initialLoadTask == nil else {
+            return
+        }
+        
+        guard case .loaded(var paginationState) = state,
               !paginationState.isLoadingMore,
               !paginationState.hasReachedEnd else {
             return
         }
 
-        loadTask?.cancel()
+        paginationTask?.cancel()
+        
+        // Set isLoadingMore synchronously BEFORE the Task suspension point
+        // to prevent race condition from duplicate calls
+        paginationState.isLoadingMore = true
+        state = .loaded(paginationState)
+        let nextPage = paginationState.currentPage + 1
 
-        loadTask = Task {
-            await fetchPage(paginationState.currentPage + 1, isInitial: false)
+        paginationTask = Task {
+            await fetchPage(nextPage)
         }
     }
 
-    private func fetchPage(_ page: Int, isInitial: Bool) async {
-        if isInitial {
+    private func fetchPage(_ page: Int) async {
+        // Only reset state to empty if this is initial load (state is .loading)
+        // For refresh (state is .loaded), keep existing photos visible
+        if page == 1, case .loading = state {
             var newState = PaginationState()
             newState.currentPage = 1
             state = .loaded(newState)
-        } else {
-            guard case .loaded(var paginationState) = state else { return }
-            paginationState.isLoadingMore = true
-            state = .loaded(paginationState)
         }
+        // Note: For pagination (page > 1), isLoadingMore is already
+        // set synchronously in loadNextPageIfNeeded() before this method runs
 
         do {
             let photos = try await dependencies.photosService.photos(
@@ -94,18 +113,21 @@ final class PhotosListViewModel {
 
             guard case .loaded(var paginationState) = state else { return }
 
-            if isInitial {
+            if page == 1 {
+                // Reset to page 1: replace photos and reset pagination state
                 paginationState.photos = photos
                 paginationState.currentPage = 1
+                paginationState.hasReachedEnd = photos.count < pageSize
             } else {
+                // Append for pagination
                 paginationState.photos.append(contentsOf: photos)
                 paginationState.currentPage = page
+                paginationState.hasReachedEnd = photos.count < pageSize
             }
 
             paginationState.isLoadingMore = false
-            paginationState.hasReachedEnd = photos.count < pageSize
 
-            if isInitial && photos.isEmpty {
+            if page == 1 && photos.isEmpty {
                 state = .empty
             } else {
                 state = .loaded(paginationState)
@@ -113,22 +135,19 @@ final class PhotosListViewModel {
         } catch APIError.cancelled {
             return
         } catch let error as APIError {
-            handle(isInitial, error: error)
+            handleError(forPage: page, error: error)
         } catch {
-            if isInitial {
-                state = .failed("Unexpected error")
-            } else {
-                guard case .loaded(var paginationState) = state else { return }
-                paginationState.isLoadingMore = false
-                state = .loaded(paginationState)
-            }
+            handleError(forPage: page, error: nil)
         }
     }
 
-    func handle(_ isInitial: Bool, error: APIError) {
-        if isInitial {
-            state = .failed(error.errorDescription ?? "Unexpected error")
+    private func handleError(forPage page: Int, error: APIError?) {
+        if page == 1 {
+            // Initial load or refresh failed - show error state
+            let message = error?.errorDescription ?? "Unexpected error"
+            state = .failed(message)
         } else {
+            // Pagination failed - keep current data and clear loading state
             guard case .loaded(var paginationState) = state else { return }
             paginationState.isLoadingMore = false
             state = .loaded(paginationState)

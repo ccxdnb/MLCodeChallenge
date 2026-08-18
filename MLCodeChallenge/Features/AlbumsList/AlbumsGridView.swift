@@ -86,8 +86,8 @@ extension AlbumsGridView {
 #Preview {
     AlbumsGridView(
         viewModel: .init(dependencies:
-                .init(albumsService: AlbumsService(client: HTTPClient()),
-                      photosService: PhotosService(client: HTTPClient()),
+                .init(albumsService: PreviewAlbumsService(),
+                      photosService: PreviewPhotosService(),
                       imageLoader: ImageLoader(cache: ImageCache()),
                       coordinator: AppCoordinator(),
                       userID: 1)

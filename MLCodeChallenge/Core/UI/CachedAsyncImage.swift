@@ -7,7 +7,6 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
     let placeholder: () -> Placeholder
 
     @State private var phase: CachedAsyncImagePhase = .empty
-    @State private var loadTask: Task<Void, Never>?
 
     private let imageLoader: ImageLoader
 
@@ -41,31 +40,27 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         .task(id: url) {
             await loadImage()
         }
-        .onDisappear {
-            loadTask?.cancel()
-        }
     }
 
+    @MainActor
     private func loadImage() async {
         guard let url = url else {
             phase = .empty
             return
         }
 
-        loadTask = Task {
-            do {
-                let uiImage = try await imageLoader.loadImage(from: url, targetSize: targetSize)
+        let scale = UITraitCollection.current.displayScale
 
-                guard !Task.isCancelled else { return }
+        do {
+            let uiImage = try await imageLoader.loadImage(from: url, targetSize: targetSize, scale: scale)
 
-                phase = .success(Image(uiImage: uiImage))
-            } catch {
-                guard !Task.isCancelled else { return }
-                phase = .failure(error)
-            }
+            guard !Task.isCancelled else { return }
+
+            phase = .success(Image(uiImage: uiImage))
+        } catch {
+            guard !Task.isCancelled else { return }
+            phase = .failure(error)
         }
-
-        await loadTask?.value
     }
 }
 

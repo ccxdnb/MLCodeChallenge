@@ -15,8 +15,8 @@ struct PhotoRow: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 CachedAsyncImage(
-                    url: photo.thumbnailURL,
-                    targetSize: CGSize(width: 200, height: 200),
+                    url: photo.fullSizeURL,
+                    targetSize: CGSize(width: 500, height: 500),
                     imageLoader: imageLoader
                 ) { image in
                     image

@@ -6,8 +6,7 @@ protocol URLSessionProtocol: Sendable {
 
 extension URLSession: URLSessionProtocol {}
 
-@MainActor
-final class ImageLoader {
+actor ImageLoader {
     private let cache: ImageCache
     private let session: URLSessionProtocol
     private var inFlightTasks: [String: Task<UIImage, Error>] = [:]
@@ -17,22 +16,22 @@ final class ImageLoader {
         self.session = session
     }
 
-    func loadImage(from url: URL, targetSize: CGSize) async throws -> UIImage {
-        let cacheKey = cacheKey(url: url, size: targetSize)
+    func loadImage(from url: URL, targetSize: CGSize, scale: CGFloat) async throws -> UIImage {
+        let cacheKey = cacheKey(url: url, size: targetSize, scale: scale)
 
         if let decoded = cache.decodedImage(for: cacheKey) {
             return decoded
         }
 
         if let compressed = cache.compressedImage(for: url.absoluteString) {
-            let decoded = try await decode(compressed, targetSize: targetSize)
+            let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
             cache.setDecoded(decoded, for: cacheKey)
             return decoded
         }
 
         if let existingTask = inFlightTasks[url.absoluteString] {
             let compressed = try await existingTask.value
-            let decoded = try await decode(compressed, targetSize: targetSize)
+            let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
             cache.setDecoded(decoded, for: cacheKey)
             return decoded
         }
@@ -53,7 +52,7 @@ final class ImageLoader {
 
             cache.setCompressed(compressed, for: url.absoluteString)
 
-            let decoded = try await decode(compressed, targetSize: targetSize)
+            let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
             cache.setDecoded(decoded, for: cacheKey)
 
             return decoded
@@ -63,22 +62,15 @@ final class ImageLoader {
         }
     }
 
-    private func cacheKey(url: URL, size: CGSize) -> String {
-        let scale = UITraitCollection.current.displayScale
+    private func cacheKey(url: URL, size: CGSize, scale: CGFloat) -> String {
         return "\(url.absoluteString)_\(Int(size.width * scale))x\(Int(size.height * scale))"
     }
 
-    private func decode(_ image: UIImage, targetSize: CGSize) async throws -> UIImage {
-        try await withCheckedThrowingContinuation { continuation in
-            Task.detached {
-                let decoded = Self.downsampleAndDecode(image, targetSize: targetSize)
-                continuation.resume(returning: decoded)
-            }
-        }
+    private func decode(_ image: UIImage, targetSize: CGSize, scale: CGFloat) async -> UIImage {
+        return await Self.downsampleAndDecode(image, targetSize: targetSize, scale: scale)
     }
 
-    private nonisolated static func downsampleAndDecode(_ image: UIImage, targetSize: CGSize) -> UIImage {
-        let scale = UITraitCollection.current.displayScale
+    private nonisolated static func downsampleAndDecode(_ image: UIImage, targetSize: CGSize, scale: CGFloat) async -> UIImage {
         let pixelSize = CGSize(
             width: targetSize.width * scale,
             height: targetSize.height * scale

@@ -8,9 +8,11 @@ import SwiftUI
 
 struct PhotosListView: View {
     @Bindable var viewModel: PhotosListViewModel
+    let imageLoader: ImageLoader
 
-    init(viewModel: PhotosListViewModel) {
+    init(viewModel: PhotosListViewModel, imageLoader: ImageLoader) {
         self.viewModel = viewModel
+        self.imageLoader = imageLoader
     }
 
     var body: some View {
@@ -26,7 +28,7 @@ struct PhotosListView: View {
             .sheet(item: $viewModel.selectedPhoto) { photo in
                 FullscreenPhotoView(
                     photo: photo,
-                    imageLoader: viewModel.dependencies.imageLoader,
+                    imageLoader: imageLoader,
                     onDismiss: { viewModel.dismissPhoto() }
                 )
             }
@@ -72,7 +74,7 @@ extension PhotosListView {
                 ForEach(paginationState.photos) { photo in
                     PhotoRow(
                         photo: photo,
-                        imageLoader: viewModel.dependencies.imageLoader,
+                        imageLoader: imageLoader,
                         onTap: { viewModel.didSelectPhoto(photo) }
                     )
                     .onAppear {
@@ -93,11 +95,13 @@ extension PhotosListView {
 }
 
 #Preview {
-    PhotosListView(
+    let imageLoader = ImageLoader(cache: ImageCache())
+    return PhotosListView(
         viewModel: .init(dependencies:
-                .init(photosService: PhotosService(client: HTTPClient()),
-                      imageLoader: ImageLoader(cache: ImageCache()),
+                .init(photosService: PreviewPhotosService(),
+                      imageLoader: imageLoader,
                       albumID: 1)
-        )
+        ),
+        imageLoader: imageLoader
     )
 }

@@ -2,7 +2,6 @@ import Testing
 import UIKit
 @testable import MLCodeChallenge
 
-@MainActor
 @Suite("ImageCache Tests")
 struct ImageCacheTests {
     @Test("stores and retrieves compressed images")

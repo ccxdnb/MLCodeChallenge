@@ -19,7 +19,7 @@ struct ImageLoaderTests {
         let cacheKey = "\(url.absoluteString)_\(Int(targetSize.width * scale))x\(Int(targetSize.height * scale))"
         cache.setDecoded(testImage, for: cacheKey)
 
-        _ = try await loader.loadImage(from: url, targetSize: targetSize)
+        _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: scale)
 
         #expect(mockSession.dataCallCount == 0)
     }
@@ -35,7 +35,7 @@ struct ImageLoaderTests {
         let testImage = createTestImage()
         mockSession.dataToReturn = testImage.pngData()
 
-        _ = try await loader.loadImage(from: url, targetSize: targetSize)
+        _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
         #expect(mockSession.dataCallCount == 1)
     }
@@ -51,7 +51,7 @@ struct ImageLoaderTests {
         let testImage = createTestImage()
         mockSession.dataToReturn = testImage.pngData()
 
-        _ = try await loader.loadImage(from: url, targetSize: targetSize)
+        _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
         let compressed = cache.compressedImage(for: url.absoluteString)
         #expect(compressed != nil)
@@ -68,7 +68,7 @@ struct ImageLoaderTests {
         let testImage = createTestImage()
         mockSession.dataToReturn = testImage.pngData()
 
-        _ = try await loader.loadImage(from: url, targetSize: targetSize)
+        _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
         let compressed = cache.compressedImage(for: url.absoluteString)
         #expect(compressed != nil)
@@ -86,9 +86,9 @@ struct ImageLoaderTests {
         mockSession.dataToReturn = testImage.pngData()
         mockSession.delayDuration = 0.1
 
-        async let result1 = loader.loadImage(from: url, targetSize: targetSize)
-        async let result2 = loader.loadImage(from: url, targetSize: targetSize)
-        async let result3 = loader.loadImage(from: url, targetSize: targetSize)
+        async let result1 = loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
+        async let result2 = loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
+        async let result3 = loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
         let images = try await [result1, result2, result3]
 
@@ -108,8 +108,8 @@ struct ImageLoaderTests {
         let testImage = createTestImage()
         mockSession.dataToReturn = testImage.pngData()
 
-        _ = try await loader.loadImage(from: url, targetSize: size1)
-        _ = try await loader.loadImage(from: url, targetSize: size2)
+        _ = try await loader.loadImage(from: url, targetSize: size1, scale: 1.0)
+        _ = try await loader.loadImage(from: url, targetSize: size2, scale: 1.0)
 
         #expect(mockSession.dataCallCount == 1)
     }
@@ -125,7 +125,7 @@ struct ImageLoaderTests {
         mockSession.dataToReturn = Data("invalid".utf8)
 
         await #expect(throws: ImageLoaderError.self) {
-            try await loader.loadImage(from: url, targetSize: targetSize)
+            try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
         }
     }
 
@@ -140,11 +140,11 @@ struct ImageLoaderTests {
         let testImage = createTestImage()
         mockSession.dataToReturn = testImage.pngData()
 
-        _ = try await loader.loadImage(from: url, targetSize: targetSize)
+        _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
         #expect(cache.compressedImage(for: url.absoluteString) != nil)
 
-        loader.flush()
+        await loader.flush()
 
         #expect(cache.compressedImage(for: url.absoluteString) == nil)
     }
@@ -160,9 +160,9 @@ struct ImageLoaderTests {
         let testImage = createTestImage()
         mockSession.dataToReturn = testImage.pngData()
 
-        _ = try await loader.loadImage(from: url, targetSize: targetSize)
+        _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
-        loader.flushDecoded()
+        await loader.flushDecoded()
 
         #expect(cache.compressedImage(for: url.absoluteString) != nil)
     }
@@ -179,8 +179,7 @@ struct ImageLoaderTests {
     }
 }
 
-@MainActor
-final class MockURLSession: URLSessionProtocol {
+final class MockURLSession: URLSessionProtocol, @unchecked Sendable {
     var dataToReturn: Data?
     var errorToThrow: Error?
     var dataCallCount = 0

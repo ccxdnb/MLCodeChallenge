@@ -116,7 +116,7 @@ extension UsersListView {
 #Preview {
     UsersListView(
         viewModel: .init(dependencies:
-                .init(usersService: UsersService(client: HTTPClient()),
+                .init(usersService: PreviewUsersService(),
                       coordinator: AppCoordinator())
         )
     )

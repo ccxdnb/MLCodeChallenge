@@ -72,7 +72,10 @@ extension AppRootView {
             AlbumsGridView(viewModel: factory.makeAlbumsListViewModel(userID: user.id))
 
         case .photos(let album):
-            PhotosListView(viewModel: factory.makePhotosGridViewModel(album: album))
+            PhotosListView(
+                viewModel: factory.makePhotosGridViewModel(album: album),
+                imageLoader: imageLoader
+            )
         }
     }
 }
