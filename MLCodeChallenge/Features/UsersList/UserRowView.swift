@@ -121,7 +121,6 @@ struct UserRowView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         )
-        .padding()
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
     }
