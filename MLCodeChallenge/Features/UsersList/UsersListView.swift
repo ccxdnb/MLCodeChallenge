@@ -61,7 +61,7 @@ extension UsersListView {
     private func userListView(users: [User]) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(users, id: \.hashValue) { user in
+                ForEach(users, id: \.id) { user in
                     UserRowView(user: user, coordinator: viewModel.coordinator)
                 }
             }

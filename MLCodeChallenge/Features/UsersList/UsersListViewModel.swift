@@ -16,11 +16,11 @@ final class UsersListViewModel {
 
     private(set) var state: ViewState<[User]> = .idle
     var searchText: String = ""
-    
+
     var filteredUsers: [User] {
         guard case .loaded(let users) = state else { return [] }
         guard !searchText.isEmpty else { return users }
-        
+
         return users.filter { user in
             user.name.localizedCaseInsensitiveContains(searchText) ||
             user.address.city.localizedCaseInsensitiveContains(searchText)
@@ -28,7 +28,7 @@ final class UsersListViewModel {
     }
 
     private let dependencies: Dependencies
-    
+
     var coordinator: AppCoordinatorProtocol {
         dependencies.coordinator
     }
@@ -43,7 +43,6 @@ final class UsersListViewModel {
      }
 
      func refresh() async {
-         // no toca el estado: la lista sigue en pantalla
          await fetch()
      }
 

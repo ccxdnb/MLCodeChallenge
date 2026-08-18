@@ -119,57 +119,57 @@ struct UsersListViewModelTests {
         #expect(response.appCoordinatorSpy.pushToCalls.count == 1)
         #expect(response.appCoordinatorSpy.pushToCalls.first == .map(user))
     }
-    
+
     // MARK: - Search Tests
-    
+
     @Test("Empty search returns all users")
     func emptySearchReturnsAll() async {
         let response = makeSUT(result: .success([.stub, .anotherStub]))
         await response.usersListViewModel.load()
-        
+
         response.usersListViewModel.searchText = ""
-        
+
         #expect(response.usersListViewModel.filteredUsers.count == 2)
     }
-    
+
     @Test("Search by name matches case-insensitively")
     func searchByName() async {
         let response = makeSUT(result: .success([.stub, .anotherStub]))
         await response.usersListViewModel.load()
-        
+
         response.usersListViewModel.searchText = "leanne"
-        
+
         #expect(response.usersListViewModel.filteredUsers.count == 1)
         #expect(response.usersListViewModel.filteredUsers.first?.name == "Leanne Graham")
     }
-    
+
     @Test("Search by city matches case-insensitively")
     func searchByCity() async {
         let response = makeSUT(result: .success([.stub, .citySearchStub]))
         await response.usersListViewModel.load()
-        
+
         response.usersListViewModel.searchText = "springfield"
-        
+
         #expect(response.usersListViewModel.filteredUsers.count == 1)
         #expect(response.usersListViewModel.filteredUsers.first?.address.city == "Springfield")
     }
-    
+
     @Test("No matches returns empty array")
     func noMatches() async {
         let response = makeSUT(result: .success([.stub, .anotherStub]))
         await response.usersListViewModel.load()
-        
+
         response.usersListViewModel.searchText = "nonexistent"
-        
+
         #expect(response.usersListViewModel.filteredUsers.isEmpty)
     }
-    
+
     @Test("Non-loaded state returns empty array")
     func nonLoadedStateReturnsEmpty() {
         let response = makeSUT(result: .success([.stub]))
-        
+
         response.usersListViewModel.searchText = "Leanne"
-        
+
         #expect(response.usersListViewModel.filteredUsers.isEmpty)
     }
 }
@@ -216,7 +216,7 @@ extension User {
             bs: "aggregate real-time technologies"
         )
     )
-    
+
     static let citySearchStub = User(
         id: 3,
         name: "Homer Simpson",

@@ -10,7 +10,7 @@ protocol UsersServiceProtocol {
     func users() async throws -> [User]
 }
 
-final class UsersService: UsersServiceProtocol {
+final class UsersService: UsersServiceProtocol, Sendable {
     private let client: HTTPClientProtocol
 
     init(client: HTTPClientProtocol) {

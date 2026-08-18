@@ -23,7 +23,6 @@ public protocol EndpointType {
 
 extension EndpointType {
     var baseURL: URL? { AppConfiguration.apiBaseURL }
-    var method: HTTPMethod { .get }
     var queryItems: [URLQueryItem]? { nil }
     var headers: [String: String]? { nil }
 
@@ -42,7 +41,7 @@ extension EndpointType {
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = method.rawValue
+        request.httpMethod = httpMethod.rawValue
         headers?.forEach { request.setValue($1, forHTTPHeaderField: $0) }
         return request
     }

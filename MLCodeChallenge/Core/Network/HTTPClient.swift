@@ -7,7 +7,7 @@
 import Foundation
 import OSLog
 
-private let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge", category: "HTTPClient")
+private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge", category: "HTTPClient")
 
 public enum HTTPMethod: String {
     case get = "GET"
@@ -18,7 +18,7 @@ protocol HTTPClientProtocol: Sendable {
     func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T
 }
 
-final class HTTPClient: HTTPClientProtocol {
+actor HTTPClient: HTTPClientProtocol {
     private let session: URLSession
     private let decoder: JSONDecoder
 
@@ -28,7 +28,7 @@ final class HTTPClient: HTTPClientProtocol {
     }
 
     func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T {
-        let request = try endpoint.urlRequest()
+        let request = try await endpoint.urlRequest()
         logger.debug("→ \(request.httpMethod ?? "") \(request.url?.absoluteString ?? "")")
 
         let data: Data
