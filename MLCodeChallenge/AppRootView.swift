@@ -9,23 +9,20 @@ import SwiftUI
 
 struct AppRootView: View {
     @State private var coordinator = AppCoordinator()
-
-    private let usersService: UsersServiceProtocol
+    @State private var factory: ViewModelFactory
 
     init(usersService: UsersServiceProtocol) {
-        self.usersService = usersService
+        let coordinator = AppCoordinator()
+        _coordinator = State(initialValue: coordinator)
+        _factory = State(initialValue: ViewModelFactory(
+            usersService: usersService,
+            coordinator: coordinator
+        ))
     }
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            UsersListView(
-                viewModel: UsersListViewModel(
-                    dependencies: .init(
-                        usersService: usersService,
-                        coordinator: coordinator
-                    )
-                )
-            )
+            UsersListView(viewModel: factory.makeUsersListViewModel())
             .navigationDestination(for: Route.self) { route in
                 self.destinationFor(route)
             }

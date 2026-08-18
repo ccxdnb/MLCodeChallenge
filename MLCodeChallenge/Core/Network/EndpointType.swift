@@ -6,13 +6,7 @@
 //
 import Foundation
 
-public enum BodyParameter {
-    case data(Data)
-    case dictionary([String: Any], options: JSONSerialization.WritingOptions = [])
-    case encodable(Encodable, encoder: JSONEncoder = .init())
-}
-
-nonisolated public protocol EndpointType {
+nonisolated protocol EndpointType {
     var baseURL: URL? { get }
     var path: String { get }
     var httpMethod: HTTPMethod { get }

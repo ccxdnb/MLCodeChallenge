@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct UsersListView: View {
-    @State private var viewModel: UsersListViewModel
+    @Bindable var viewModel: UsersListViewModel
 
     init(viewModel: UsersListViewModel) {
-        _viewModel = State(initialValue: viewModel)
+        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -20,7 +20,11 @@ struct UsersListView: View {
             .navigationTitle("Users")
             .searchable(text: $viewModel.searchText, prompt: "Search by name or city")
             .searchToolbarBehavior(.minimize)
-            .task { await viewModel.load() }
+            .task {
+                if case .idle = viewModel.state {
+                    await viewModel.load()
+                }
+            }
             .refreshable { await viewModel.refresh() }
     }
 }
@@ -28,48 +32,68 @@ struct UsersListView: View {
 extension UsersListView {
     @ViewBuilder
     private var contentView: some View {
-        VStack(spacing: 0) {
+        Group {
             switch viewModel.state {
             case .loading:
                 VStack {
                     ProgressView()
                     Text("Loading...")
-                }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
 
             case .loaded:
-                if viewModel.filteredUsers.isEmpty && !viewModel.searchText.isEmpty {
-                    ContentUnavailableView.search(text: viewModel.searchText)
-                } else {
-                    userListView(users: viewModel.filteredUsers)
-                }
+                loadedContent
+                    .transition(.opacity)
 
             case .idle:
-                Text("Idle")
+                Color.clear
 
             case .empty:
                 EmptyStateView()
+                    .transition(.opacity)
 
             case let .failed(message):
                 FailedStateView(message: message) {
                     Task { await viewModel.load() }
                 }
             }
+        }.animation(.smooth(duration: 0.3), value: viewModel.state.caseID)
+    }
+
+    @ViewBuilder
+    private var loadedContent: some View {
+        Group {
+            if viewModel.filteredUsers.isEmpty && !viewModel.searchText.isEmpty {
+                ContentUnavailableView.search(text: viewModel.searchText)
+                    .transition(.opacity)
+            } else {
+                userListView(users: viewModel.filteredUsers)
+            }
         }
+        .animation(.smooth(duration: 0.25), value: viewModel.filteredUsers.isEmpty)
     }
 
     @ViewBuilder
     private func userListView(users: [User]) -> some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(users, id: \.id) { user in
-                    UserRowView(user: user) {
-                        viewModel.didSelect(user)
-                    }
+        List {
+            ForEach(users) { user in
+                UserRowView(user: user) {
+                    viewModel.didSelect(user)
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
+            }
+            .onDelete { indexSet in
+                indexSet.forEach { index in
+                    viewModel.deleteUser(users[index])
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .animation(.smooth(duration: 0.25), value: users)
     }
 }
 

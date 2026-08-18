@@ -6,7 +6,7 @@
 //
 import Foundation
 
-nonisolated struct User: Codable, Sendable, Equatable, Hashable {
+nonisolated struct User: Codable, Sendable, Equatable, Hashable, Identifiable {
     let id: Int
     let name: String
     let username: String

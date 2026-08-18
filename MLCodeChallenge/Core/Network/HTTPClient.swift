@@ -9,7 +9,7 @@ import OSLog
 
 private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge", category: "HTTPClient")
 
-public enum HTTPMethod: String {
+enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
 }
@@ -65,6 +65,7 @@ private extension URLError {
         switch code {
         case .notConnectedToInternet, .networkConnectionLost: .noConnection
         case .timedOut: .timeout
+        case .cancelled: .cancelled
         default: .unknown
         }
     }

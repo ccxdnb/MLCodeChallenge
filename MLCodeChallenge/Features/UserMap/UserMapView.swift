@@ -21,9 +21,11 @@ struct UserMapView: View {
             snippet: user.address.city
         )
         .ignoresSafeArea()
+
     }
 }
 
 #Preview {
+
     UserMapView(user: .stub)
 }

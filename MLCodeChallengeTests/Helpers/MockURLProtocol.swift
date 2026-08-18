@@ -27,6 +27,7 @@ import Foundation
 /// ```
 final class MockURLProtocol: URLProtocol {
     static let state = MockURLProtocolState()
+    private var loadingTask: Task<Void, Never>?
 
     override static func canInit(with request: URLRequest) -> Bool {
         true
@@ -37,7 +38,7 @@ final class MockURLProtocol: URLProtocol {
     }
 
     override func startLoading() {
-        Task {
+        loadingTask = Task {
             do {
                 let (response, data) = try await Self.state.executeHandler(for: request)
                 client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
@@ -49,7 +50,10 @@ final class MockURLProtocol: URLProtocol {
         }
     }
 
-    override func stopLoading() {}
+    override func stopLoading() {
+        loadingTask?.cancel()
+        loadingTask = nil
+    }
 }
 
 /// Creates an HTTPClient configured to use MockURLProtocol for testing.

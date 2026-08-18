@@ -56,4 +56,10 @@ final class UsersListViewModel {
     func didSelect(_ user: User) {
         dependencies.coordinator.pushTo(.map(user))
     }
+
+    func deleteUser(_ user: User) {
+        guard case .loaded(var users) = state else { return }
+        users.removeAll { $0.id == user.id }
+        state = users.isEmpty ? .empty : .loaded(users)
+    }
 }

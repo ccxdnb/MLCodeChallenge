@@ -55,4 +55,17 @@ struct AppCoordinatorTests {
 
         #expect(sut.presentedSheet == nil)
     }
+
+    @Test("Returns the same view model instance on repeated calls")
+    func cachesViewModel() {
+        let sut = ViewModelFactory(
+            usersService: UsersServiceMock(),
+            coordinator: AppCoordinatorSpy()
+        )
+
+        let first = sut.makeUsersListViewModel()
+        let second = sut.makeUsersListViewModel()
+
+        #expect(first === second)
+    }
 }

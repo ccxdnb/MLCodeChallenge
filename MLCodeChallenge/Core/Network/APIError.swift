@@ -15,6 +15,7 @@ enum APIError: LocalizedError, Equatable {
     case decoding
     case noConnection
     case timeout
+    case cancelled
     case unknown
 
     var errorDescription: String? {
@@ -31,6 +32,8 @@ enum APIError: LocalizedError, Equatable {
             "No internet connection."
         case .timeout:
             "The request timed out."
+        case .cancelled:
+            nil
         }
     }
 

@@ -39,8 +39,8 @@ struct GoogleMapView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: GMSMapView, context: Context) {
-        guard context.coordinator.lastCoordinate?.latitude != coordinate.latitude,
-        context.coordinator.lastCoordinate?.longitude != coordinate.longitude else { return }
+        guard context.coordinator.lastCoordinate?.latitude != coordinate.latitude ||
+                context.coordinator.lastCoordinate?.longitude != coordinate.longitude else { return }
 
         context.coordinator.marker?.position = coordinate
         context.coordinator.marker?.title = title
