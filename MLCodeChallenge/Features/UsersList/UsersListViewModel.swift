@@ -57,8 +57,12 @@ final class UsersListViewModel {
         }
     }
 
-    func didSelect(_ user: User) {
+    func didTapMapIcon(_ user: User) {
         dependencies.coordinator.pushTo(.map(user))
+    }
+
+    func didSelect(_ user: User) {
+        dependencies.coordinator.pushTo(.userDetail(user))
     }
 
     func deleteUser(_ user: User) async {

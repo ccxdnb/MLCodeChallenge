@@ -91,12 +91,16 @@ extension UsersListView {
         List {
             ForEach(users) { user in
                 UserRowView(user: user) {
+                    viewModel.didTapMapIcon(user)
+                }
+                .onTapGesture {
                     viewModel.didSelect(user)
                 }
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)
             }
+
             .onDelete { indexSet in
                 indexSet.forEach { index in
                     Task { await viewModel.deleteUser(users[index]) }

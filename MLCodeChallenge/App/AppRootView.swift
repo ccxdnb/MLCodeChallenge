@@ -38,7 +38,7 @@ extension AppRootView {
             UserMapView(user: user)
 
         case let .userDetail(user):
-            EmptyView()
+            UserDetailView(user: user)
         }
     }
 }
