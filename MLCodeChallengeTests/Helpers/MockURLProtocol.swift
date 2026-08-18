@@ -69,3 +69,36 @@ func makeTestHTTPClient() -> HTTPClient {
     let session = URLSession(configuration: config)
     return HTTPClient(session: session)
 }
+
+extension MockURLProtocol {
+    /// Sets a handler returning the given status code and body, runs the test
+    /// body, and always clears the handler afterwards.
+    static func withResponse(
+        statusCode: Int,
+        data: Data = Data(),
+        _ body: () async throws -> Void
+    ) async throws {
+        await state.setHandler { request in
+            guard let url = request.url else { throw APIError.invalidURL }
+            guard let response = HTTPURLResponse(
+                url: url,
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            ) else { throw APIError.invalidResponse }
+            return (response, data)
+        }
+        defer { Task { await state.clearHandler() } }
+        try await body()
+    }
+
+    /// Sets a handler that throws the given error.
+    static func withFailure(
+        _ error: Error,
+        _ body: () async throws -> Void
+    ) async throws {
+        await state.setHandler { _ in throw error }
+        defer { Task { await state.clearHandler() } }
+        try await body()
+    }
+}

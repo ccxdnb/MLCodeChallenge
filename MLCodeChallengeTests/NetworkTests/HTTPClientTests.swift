@@ -252,4 +252,24 @@ struct HTTPClientTests {
 
         await MockURLProtocol.state.clearHandler()
     }
+
+    @Test("Execute without return type succeeds with 200 and empty body")
+    func executeWithoutReturnTypeSucceedsWithEmptyBody() async throws {
+        let client = makeTestHTTPClient()
+
+        try await MockURLProtocol.withResponse(statusCode: 200) {
+            try await client.execute(UsersAPI.deleteUser(userID: User.stub.id))
+        }
+    }
+
+    @Test("Execute without return type throws on 404")
+    func executeWithoutReturnTypeThrowsOnNotFound() async throws {
+        let client = makeTestHTTPClient()
+
+        try await MockURLProtocol.withResponse(statusCode: 404) {
+            await #expect(throws: APIError.notFound) {
+                try await client.execute(UsersAPI.deleteUser(userID: User.stub.id))
+            }
+        }
+    }
 }

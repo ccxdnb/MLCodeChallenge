@@ -16,6 +16,7 @@ final class UsersListViewModel {
 
     private(set) var state: ViewState<[User]> = .idle
     var searchText: String = ""
+    var deleteError: String?
 
     var filteredUsers: [User] {
         guard case .loaded(let users) = state else { return [] }
@@ -46,6 +47,9 @@ final class UsersListViewModel {
         do {
             let users = try await dependencies.usersService.users()
             state = users.isEmpty ? .empty : .loaded(users)
+        } catch APIError.cancelled {
+            // we dont react to cancelations
+            return
         } catch let error as APIError {
             state = .failed(error.errorDescription ?? "Unexpected error")
         } catch {
@@ -57,18 +61,19 @@ final class UsersListViewModel {
         dependencies.coordinator.pushTo(.map(user))
     }
 
-    func deleteUser(_ user: User) {
-        Task {
-            do {
-                try await dependencies.usersService.deleteUser(userId: user.id)
-                guard case .loaded(var users) = state else { return }
-                users.removeAll { $0.id == user.id }
-                state = users.isEmpty ? .empty : .loaded(users)
-            } catch let error as APIError {
-                state = .failed(error.errorDescription ?? "Unexpected error")
-            } catch {
-                state = .failed("Unexpected error")
-            }
+    func deleteUser(_ user: User) async {
+        guard case .loaded(let original) = state else { return }
+
+        let remaining = original.filter { $0.id != user.id }
+        state = remaining.isEmpty ? .empty : .loaded(remaining)
+
+        do {
+            try await dependencies.usersService.deleteUser(userId: user.id)
+        } catch APIError.cancelled {
+            return
+        } catch {
+            state = .loaded(original)
+            deleteError = (error as? APIError)?.errorDescription ?? "Failed to delete user"
         }
     }
 }

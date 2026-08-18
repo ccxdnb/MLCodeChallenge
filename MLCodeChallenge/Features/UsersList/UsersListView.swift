@@ -26,6 +26,18 @@ struct UsersListView: View {
                 }
             }
             .refreshable { await viewModel.refresh() }
+            .alert("Delete Failed", isPresented: .init(
+                get: { viewModel.deleteError != nil },
+                set: { if !$0 { viewModel.deleteError = nil } }
+            )) {
+                Button("OK", role: .cancel) {
+                    viewModel.deleteError = nil
+                }
+            } message: {
+                if let error = viewModel.deleteError {
+                    Text(error)
+                }
+            }
     }
 }
 
@@ -87,7 +99,7 @@ extension UsersListView {
             }
             .onDelete { indexSet in
                 indexSet.forEach { index in
-                    viewModel.deleteUser(users[index])
+                    Task { await viewModel.deleteUser(users[index]) }
                 }
             }
         }

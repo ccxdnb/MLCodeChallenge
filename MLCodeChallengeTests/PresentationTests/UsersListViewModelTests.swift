@@ -172,6 +172,69 @@ struct UsersListViewModelTests {
 
         #expect(response.usersListViewModel.filteredUsers.isEmpty)
     }
+
+    // MARK: - Delete Tests
+
+    @Test("Delete user removes it from loaded state")
+    func deleteUserRemovesFromState() async {
+        let response = makeSUT(result: .success([.stub, .anotherStub]))
+        await response.usersListViewModel.load()
+
+        response.usersServiceMock.deleteResult = .success(())
+        await response.usersListViewModel.deleteUser(.stub)
+
+        guard case .loaded(let users) = response.usersListViewModel.state else {
+            Issue.record("Expected .loaded, got \(response.usersListViewModel.state)")
+            return
+        }
+        #expect(users.count == 1)
+        #expect(users.first?.id == User.anotherStub.id)
+        #expect(response.usersServiceMock.deleteCallCount == 1)
+        #expect(response.usersServiceMock.lastDeletedUserId == User.stub.id)
+    }
+
+    @Test("Delete user failure restores the user and surfaces the error")
+    func deleteUserFailureRestoresUser() async {
+        let response = makeSUT(result: .success([.stub, .anotherStub]))
+        await response.usersListViewModel.load()
+
+        response.usersServiceMock.deleteResult = .failure(APIError.server(statusCode: 500))
+        await response.usersListViewModel.deleteUser(.stub)
+
+        guard case .loaded(let users) = response.usersListViewModel.state else {
+            Issue.record("Expected .loaded, got \(response.usersListViewModel.state)")
+            return
+        }
+        #expect(users.count == 2)
+        #expect(users.contains { $0.id == User.stub.id })
+        #expect(response.usersListViewModel.deleteError == APIError.server(statusCode: 500).errorDescription)
+    }
+
+    @Test("Delete does not call the service when state is not loaded")
+    func deleteWithoutLoadedStateDoesNothing() async {
+        let response = makeSUT(result: .success([]))
+
+        await response.usersListViewModel.deleteUser(.stub)
+
+        #expect(response.usersServiceMock.deleteCallCount == 0)
+    }
+
+    // MARK: - Cancellation
+
+    @Test("Cancelled error leaves the previous state untouched")
+    func cancelledErrorDoesNotChangeState() async {
+        let response = makeSUT(result: .success([.stub]))
+        await response.usersListViewModel.load()
+
+        response.usersServiceMock.result = .failure(APIError.cancelled)
+        await response.usersListViewModel.refresh()
+
+        guard case .loaded(let users) = response.usersListViewModel.state else {
+            Issue.record("Expected .loaded, got \(response.usersListViewModel.state)")
+            return
+        }
+        #expect(users.count == 1)
+    }
 }
 
 extension User {
