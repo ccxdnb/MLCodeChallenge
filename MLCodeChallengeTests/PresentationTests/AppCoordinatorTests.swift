@@ -60,6 +60,9 @@ struct AppCoordinatorTests {
     func cachesViewModel() {
         let sut = ViewModelFactory(
             usersService: UsersServiceMock(),
+            albumsService: AlbumsServiceMock(),
+            photosService: PhotosServiceMock(),
+            imageLoader: ImageLoader(cache: ImageCache()),
             coordinator: AppCoordinatorSpy()
         )
 

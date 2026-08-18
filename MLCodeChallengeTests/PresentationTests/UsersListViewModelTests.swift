@@ -117,7 +117,7 @@ struct UsersListViewModelTests {
         response.usersListViewModel.didSelect(user)
 
         #expect(response.appCoordinatorSpy.pushToCalls.count == 1)
-        #expect(response.appCoordinatorSpy.pushToCalls.first == .map(user))
+        #expect(response.appCoordinatorSpy.pushToCalls.first == .userDetail(user))
     }
 
     // MARK: - Search Tests

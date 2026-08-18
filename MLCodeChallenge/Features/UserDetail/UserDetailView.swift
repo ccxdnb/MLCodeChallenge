@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct UserDetailView: View {
-    let user: User
+    @Bindable var viewModel: UserDetailViewModel
+
+    init(viewModel: UserDetailViewModel) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
             ScrollView {
@@ -17,6 +21,7 @@ struct UserDetailView: View {
                     contactSection
                     companySection
                     addressSection
+                    albumsButton
                 }
                 .padding()
             }
@@ -31,11 +36,11 @@ struct UserDetailView: View {
                 .font(.system(size: 56))
                 .foregroundStyle(.secondary)
 
-            Text(user.name)
+            Text(viewModel.user.name)
                 .font(.title2.weight(.semibold))
                 .multilineTextAlignment(.center)
 
-            Text("@\(user.username)")
+            Text("@\(viewModel.user.username)")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -45,16 +50,16 @@ struct UserDetailView: View {
 
     private var contactSection: some View {
         DetailSection(title: "Contact") {
-            DetailRow(icon: "envelope.fill", value: user.email)
-            DetailRow(icon: "phone.fill", value: user.phone)
-            DetailRow(icon: "globe", value: user.website)
+            DetailRow(icon: "envelope.fill", value: viewModel.user.email)
+            DetailRow(icon: "phone.fill", value: viewModel.user.phone)
+            DetailRow(icon: "globe", value: viewModel.user.website)
         }
     }
 
     private var companySection: some View {
         DetailSection(title: "Company") {
-            DetailRow(icon: "building.2.fill", value: user.company.name)
-            DetailRow(icon: "quote.opening", value: user.company.catchPhrase)
+            DetailRow(icon: "building.2.fill", value: viewModel.user.company.name)
+            DetailRow(icon: "quote.opening", value: viewModel.user.company.catchPhrase)
         }
     }
 
@@ -62,12 +67,36 @@ struct UserDetailView: View {
         DetailSection(title: "Address") {
             DetailRow(
                 icon: "mappin.and.ellipse",
-                value: "\(user.address.street), \(user.address.suite)"
+                value: "\(viewModel.user.address.street), \(viewModel.user.address.suite)"
             )
-            DetailRow(icon: "building.fill", value: user.address.city)
-            DetailRow(icon: "number", value: user.address.zipcode)
+            DetailRow(icon: "building.fill", value: viewModel.user.address.city)
+            DetailRow(icon: "number", value: viewModel.user.address.zipcode)
 
         }.frame(maxWidth: .infinity)
+    }
+
+    private var albumsButton: some View {
+        Button(action: viewModel.didTapViewAlbums) {
+            HStack {
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.body.weight(.medium))
+
+                Text("View albums")
+                    .font(.body.weight(.medium))
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+            }
+            .foregroundStyle(.primary)
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+            )
+        }
     }
 }
 
@@ -119,5 +148,10 @@ private struct DetailRow: View {
 }
 
 #Preview {
-    UserDetailView(user: .stub)
+    UserDetailView(
+        viewModel: .init(dependencies: .init(
+            coordinator: AppCoordinator(),
+            user: .stub
+        ))
+    )
 }
