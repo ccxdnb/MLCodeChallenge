@@ -11,22 +11,21 @@ struct FailedStateView: View {
     let retryAction: () -> Void
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Label("Error", systemImage: "exclamationmark.triangle")
+                .font(.title2)
+                .foregroundStyle(.red)
 
             Text(message)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
 
             Button("Retry") {
                 retryAction()
             }
             .buttonStyle(.borderedProminent)
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-        )
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

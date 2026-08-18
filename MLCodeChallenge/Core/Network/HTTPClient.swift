@@ -12,10 +12,12 @@ private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge"
 enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
+    case delete = "DELETE"
 }
 
 protocol HTTPClientProtocol: Sendable {
     func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T
+    func execute(_ endpoint: EndpointType) async throws
 }
 
 final class HTTPClient: HTTPClientProtocol, Sendable {
@@ -28,6 +30,23 @@ final class HTTPClient: HTTPClientProtocol, Sendable {
     }
 
     func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T {
+        let data = try await perform(endpoint)
+
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            logger.error("Decoding \(String(describing: T.self)) failed: \(error.localizedDescription)")
+            throw APIError.decoding
+        }
+    }
+
+    func execute(_ endpoint: EndpointType) async throws {
+        _ = try await perform(endpoint)
+    }
+
+    /// Sends the request and validates the response. Returns the raw body so
+    /// callers decide whether to decode it or discard it.
+    private func perform(_ endpoint: EndpointType) async throws -> Data {
         let request = try endpoint.urlRequest()
         logger.debug("→ \(request.httpMethod ?? "") \(request.url?.absoluteString ?? "")")
 
@@ -51,12 +70,7 @@ final class HTTPClient: HTTPClientProtocol, Sendable {
             throw APIError.from(statusCode: http.statusCode)
         }
 
-        do {
-            return try decoder.decode(T.self, from: data)
-        } catch {
-            logger.error("Decoding \(String(describing: T.self)) failed: \(error.localizedDescription)")
-            throw APIError.decoding
-        }
+        return data
     }
 }
 

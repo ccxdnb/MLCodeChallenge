@@ -42,7 +42,7 @@ final class UsersListViewModel {
          await fetch()
      }
 
-    func fetch() async {
+    private func fetch() async {
         do {
             let users = try await dependencies.usersService.users()
             state = users.isEmpty ? .empty : .loaded(users)
@@ -58,8 +58,17 @@ final class UsersListViewModel {
     }
 
     func deleteUser(_ user: User) {
-        guard case .loaded(var users) = state else { return }
-        users.removeAll { $0.id == user.id }
-        state = users.isEmpty ? .empty : .loaded(users)
+        Task {
+            do {
+                try await dependencies.usersService.deleteUser(userId: user.id)
+                guard case .loaded(var users) = state else { return }
+                users.removeAll { $0.id == user.id }
+                state = users.isEmpty ? .empty : .loaded(users)
+            } catch let error as APIError {
+                state = .failed(error.errorDescription ?? "Unexpected error")
+            } catch {
+                state = .failed("Unexpected error")
+            }
+        }
     }
 }

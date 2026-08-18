@@ -8,10 +8,18 @@ import Foundation
 
 nonisolated enum UsersAPI: EndpointType {
     case users
+    case deleteUser(userID: Int)
     case albums(userID: Int)
     case photos(albumID: Int, page: Int, limit: Int)
 
-    var httpMethod: HTTPMethod { .get }
+    var httpMethod: HTTPMethod {
+        switch self {
+        case .users, .albums, .photos:
+                .get
+        case .deleteUser:
+                .delete
+        }
+    }
 
     var path: String {
         switch self {
@@ -21,12 +29,14 @@ nonisolated enum UsersAPI: EndpointType {
             "/albums"
         case .photos:
             "/photos"
+        case let .deleteUser(userId):
+            "/users/\(userId)"
         }
     }
 
     var queryItems: [URLQueryItem]? {
         switch self {
-        case .users:
+        case .users, .deleteUser:
             nil
         case .albums(let userID):
             [URLQueryItem(name: "userId", value: String(userID))]
