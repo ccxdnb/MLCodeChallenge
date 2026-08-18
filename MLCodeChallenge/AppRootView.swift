@@ -38,7 +38,7 @@ extension AppRootView {
     func destinationFor(_ route: Route) -> some View {
         switch route {
         case .map(let user):
-            UserMapView()
+            UserMapView(user: user)
 
         case let .userDetail(user):
             EmptyView()

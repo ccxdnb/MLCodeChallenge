@@ -69,12 +69,3 @@ private extension URLError {
         }
     }
 }
-
-nonisolated enum AppConfiguration {
-    static let apiBaseURL: URL = {
-        guard let url = URL(string: "https://jsonplaceholder.typicode.com") else {
-            preconditionFailure("Invalid base URL literal")
-        }
-        return url
-    }()
-}

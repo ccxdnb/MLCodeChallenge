@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		945348CE3034990F00D6F7BA /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 945348CD3034990F00D6F7BA /* GoogleMaps */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		94911131302FB5AF0024F000 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -66,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				945348CE3034990F00D6F7BA /* GoogleMaps in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +132,7 @@
 			);
 			name = MLCodeChallenge;
 			packageProductDependencies = (
+				945348CD3034990F00D6F7BA /* GoogleMaps */,
 			);
 			productName = MLCodeChallenge;
 			productReference = 94911123302FB5AD0024F000 /* MLCodeChallenge.app */;
@@ -210,6 +216,9 @@
 			);
 			mainGroup = 9491111A302FB5AD0024F000;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				945348CC3034990F00D6F7BA /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 94911124302FB5AD0024F000 /* Products */;
 			projectDirPath = "";
@@ -620,6 +629,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		945348CC3034990F00D6F7BA /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		945348CD3034990F00D6F7BA /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 945348CC3034990F00D6F7BA /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9491111B302FB5AD0024F000 /* Project object */;
 }
