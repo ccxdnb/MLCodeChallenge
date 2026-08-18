@@ -29,10 +29,6 @@ final class UsersListViewModel {
 
     private let dependencies: Dependencies
 
-    var coordinator: AppCoordinatorProtocol {
-        dependencies.coordinator
-    }
-
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
     }

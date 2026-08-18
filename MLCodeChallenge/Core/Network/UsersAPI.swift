@@ -11,9 +11,7 @@ nonisolated enum UsersAPI: EndpointType {
     case albums(userID: Int)
     case photos(albumID: Int, page: Int, limit: Int)
 
-    var baseUrl: URL? { AppConfiguration.apiBaseURL }
     var httpMethod: HTTPMethod { .get }
-    var urlQueries: [String: String]? { nil }
 
     var path: String {
         switch self {

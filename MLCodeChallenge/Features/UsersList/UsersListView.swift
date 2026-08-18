@@ -62,7 +62,9 @@ extension UsersListView {
         ScrollView {
             LazyVStack(spacing: 8) {
                 ForEach(users, id: \.id) { user in
-                    UserRowView(user: user, coordinator: viewModel.coordinator)
+                    UserRowView(user: user) {
+                        viewModel.didSelect(user)
+                    }
                 }
             }
             .padding(.horizontal, 16)

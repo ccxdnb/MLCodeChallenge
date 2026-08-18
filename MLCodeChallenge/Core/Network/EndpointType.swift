@@ -12,16 +12,15 @@ public enum BodyParameter {
     case encodable(Encodable, encoder: JSONEncoder = .init())
 }
 
-public protocol EndpointType {
+nonisolated public protocol EndpointType {
     var baseURL: URL? { get }
     var path: String { get }
     var httpMethod: HTTPMethod { get }
-    var urlQueries: [String: String]? { get }
     var headers: [String: String]? { get }
     var queryItems: [URLQueryItem]? { get }
 }
 
-extension EndpointType {
+nonisolated extension EndpointType {
     var baseURL: URL? { AppConfiguration.apiBaseURL }
     var queryItems: [URLQueryItem]? { nil }
     var headers: [String: String]? { nil }

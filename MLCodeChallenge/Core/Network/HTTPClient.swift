@@ -18,7 +18,7 @@ protocol HTTPClientProtocol: Sendable {
     func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T
 }
 
-actor HTTPClient: HTTPClientProtocol {
+final class HTTPClient: HTTPClientProtocol, Sendable {
     private let session: URLSession
     private let decoder: JSONDecoder
 
@@ -28,7 +28,7 @@ actor HTTPClient: HTTPClientProtocol {
     }
 
     func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T {
-        let request = try await endpoint.urlRequest()
+        let request = try endpoint.urlRequest()
         logger.debug("→ \(request.httpMethod ?? "") \(request.url?.absoluteString ?? "")")
 
         let data: Data
