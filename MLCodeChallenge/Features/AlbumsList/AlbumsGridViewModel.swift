@@ -35,8 +35,8 @@ final class AlbumsGridViewModel {
         await fetch()
     }
 
-    func getImageLoader() -> ImageLoader {
-        return self.dependencies.imageLoader
+    var imageLoader: ImageLoader {
+        dependencies.imageLoader
     }
 
     private func fetch() async {
