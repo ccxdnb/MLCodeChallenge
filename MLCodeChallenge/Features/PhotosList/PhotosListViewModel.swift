@@ -35,11 +35,6 @@ final class PhotosListViewModel {
         self.dependencies = dependencies
     }
 
-    deinit {
-        initialLoadTask?.cancel()
-        paginationTask?.cancel()
-    }
-
     func loadInitial() async {
         initialLoadTask?.cancel()
 
