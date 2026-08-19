@@ -50,6 +50,7 @@ final class PhotosListViewModel {
 
     func refresh() async {
         initialLoadTask?.cancel()
+        paginationTask?.cancel()
 
         // If state is not .loaded, treat refresh like initial load
         if case .loaded = state {
