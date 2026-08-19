@@ -22,13 +22,13 @@ Razones las cuales se explican luego en este documento.
 
 ## Screenshots
 
-| Usuarios | Mapa | Detalle |
-| -------- | ------- | ------- |
+| Usuarios                                                                                                                                  | Mapa                                                                                                                          | Detalle                                                                                                                                      |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/UserListView.png?raw=true" width="300" alt="Users List View"> | <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/MapView.png?raw=true" width="300" alt="Map View"> | <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/UserDetailView.png?raw=true" width="300" alt="User Detail View"> |
 
-| Albumes | Fotos | Pantalla Completa |
-| ----- | ----------------- | ---- |
-|<img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/AlbumListView.png?raw=true" width="300" alt="Album List View">| <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/PhotoListView.png?raw=true" width="300" alt="Photos List View"> | <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/FullSizePhotoView.png?raw=true" width="300" alt="Full Screen View"> |
+| Albumes                                                                                                                                    | Fotos                                                                                                                                       | Pantalla Completa                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/AlbumListView.png?raw=true" width="300" alt="Album List View"> | <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/PhotoListView.png?raw=true" width="300" alt="Photos List View"> | <img src="https://github.com/ccxdnb/MLCodeChallenge/blob/main/Demo%20Images/FullSizePhotoView.png?raw=true" width="300" alt="Full Screen View"> |
 
 ---
 
@@ -53,7 +53,7 @@ Idealmente "Build & Run", no hay que instalar ni configurar nada.
 
 ## Sobre el alcance
 
-Tome la interpretacion sobre "Funcionalidad a tu criterio" que me permita explorar distintos mecanismos dentro de iOS. Elegi ir por la opcion de incluir albumes/fotos ya que es la unica que me permite trabajar con un volumen que se acerca un poco mas a lo real (5000 fotos con paginado y carga asyncrona de imagenes). Continuar por los post/comentarios es agregar mas CRUD de texto, lo cual considero redudante ya teniendo la lista de usuarios. 
+Tome la interpretacion sobre "Funcionalidad a tu criterio" que me permita explorar distintos mecanismos dentro de iOS. Elegi ir por la opcion de incluir albumes/fotos ya que es la unica que me permite trabajar con un volumen que se acerca un poco mas a lo real (5000 fotos con paginado y carga asyncrona de imagenes). Continuar por los post/comentarios es agregar mas CRUD de texto, lo cual considero redundante ya teniendo la lista de usuarios. 
 El detalle de usuario nace de la opcion de no contaminar la celda con mas botones y parece el lugar apropiado para incluir la redireccion hacia los albumes asociados con el usuario. 
 Cache offline, favoritos guardados, design system propio, quedan fuera del scope de este Challenge ya que considero que las 5 pantallas propuestas alcanzan para demostrar Arquitectura, buenas practicas, patrones de diseño, concurrencia y testing.
 
@@ -102,7 +102,7 @@ final class UsersListViewModel {
 Tambien considere una implementacion por composicion de protocolos:
 
 ```swift
-typealias Dependencies = HasUsersService & HasCoordinator}
+typealias Dependencies = HasUsersService & HasCoordinator
 ```
 
 La cual permite una mayor escalabilidad a medida que va creciento pero considero que para un challenge de 5 pantallas es infrastructura que no va a ser utilizada.
@@ -242,7 +242,7 @@ JSONPlaceholder tiene 3 cositas que condicionaron levemente la implementacion.
 
 - Las coordenadas de `Geo` son falsas y se exponen como string.
   
-  - La conversion de String a Float se realiza en el decoding, de esta forma prevenimos generar modelos que puedan tener errores en sus datos y romper en runtime.
+  - La conversion de String a Double se realiza en el decoding, de esta forma prevenimos generar modelos que puedan tener errores en sus datos y romper en runtime.
   
   - No coinciden con la city propuesta en el modelo address por lo que la posicion en el mapa difiere.
 
@@ -278,7 +278,7 @@ Dado el contexto de este proyecto es que tambien se usa `URLProtocol` y no una l
 
 En `ImageCache` es necesario testear la no inversion de los niveles ya que puede ser un bug que no genere un error sino hacer mas lenta la app por lo cual es dificil de debuggear.
 
-De esta formalas vistas de SwiftUI, test de UI, test de SDK de Google y Apple no estan incluidos en este Challenge.
+De esta forma las vistas de SwiftUI, test de UI, test de SDK de Google y Apple no estan incluidos en este Challenge.
 
 ---
 
