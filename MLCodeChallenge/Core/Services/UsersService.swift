@@ -8,7 +8,7 @@ import Foundation
 
 protocol UsersServiceProtocol {
     func users() async throws -> [User]
-    func deleteUser(userId: Int) async throws
+    func deleteUser(userID: Int) async throws
 }
 
 final class UsersService: UsersServiceProtocol {
@@ -22,7 +22,7 @@ final class UsersService: UsersServiceProtocol {
         try await client.execute(UsersAPI.users)
     }
 
-    func deleteUser(userId: Int) async throws {
-        try await client.execute(UsersAPI.deleteUser(userID: userId))
+    func deleteUser(userID: Int) async throws {
+        try await client.execute(UsersAPI.deleteUser(userID: userID))
     }
 }

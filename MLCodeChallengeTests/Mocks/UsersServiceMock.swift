@@ -12,16 +12,16 @@ final class UsersServiceMock: UsersServiceProtocol {
     var deleteResult: Result<Void, Error> = .success(())
     private(set) var callCount = 0
     private(set) var deleteCallCount = 0
-    private(set) var lastDeletedUserId: Int?
+    private(set) var lastDeletedUserID: Int?
 
     func users() async throws -> [User] {
         callCount += 1
         return try result.get()
     }
 
-    func deleteUser(userId: Int) async throws {
+    func deleteUser(userID: Int) async throws {
         deleteCallCount += 1
-        lastDeletedUserId = userId
+        lastDeletedUserID = userID
         try deleteResult.get()
     }
 }

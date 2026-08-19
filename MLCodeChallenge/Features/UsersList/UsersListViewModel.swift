@@ -72,7 +72,7 @@ final class UsersListViewModel {
         state = remaining.isEmpty ? .empty : .loaded(remaining)
 
         do {
-            try await dependencies.usersService.deleteUser(userId: user.id)
+            try await dependencies.usersService.deleteUser(userID: user.id)
         } catch APIError.cancelled {
             return
         } catch {

@@ -190,7 +190,7 @@ struct UsersListViewModelTests {
         #expect(users.count == 1)
         #expect(users.first?.id == User.anotherStub.id)
         #expect(response.usersServiceMock.deleteCallCount == 1)
-        #expect(response.usersServiceMock.lastDeletedUserId == User.stub.id)
+        #expect(response.usersServiceMock.lastDeletedUserID == User.stub.id)
     }
 
     @Test("Delete user failure restores the user and surfaces the error")
