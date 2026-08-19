@@ -38,7 +38,7 @@ struct AppRootView: View {
             for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
                 logger.debug("Memory warning received via NotificationCenter!")
                 Task {
-                    await imageLoader.removeAll()
+                    await imageLoader.removeAllDecoded()
                 }
                 URLCache.shared.removeAllCachedResponses()
         }

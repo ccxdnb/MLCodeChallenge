@@ -77,8 +77,10 @@ struct ImageLoaderTests {
 
         _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
-        let compressed = cache.compressedImage(for: url.absoluteString)
-        #expect(compressed != nil)
+        let scale: CGFloat = 1.0
+        let cacheKey = "\(url.absoluteString)_\(Int(targetSize.width * scale))x\(Int(targetSize.height * scale))"
+        let decoded = cache.decodedImage(for: cacheKey)
+        #expect(decoded != nil)
     }
 
     @Test("deduplicates concurrent requests for same URL")
