@@ -1,5 +1,5 @@
 //
-//  FullscreenPhotoView.swift
+//  PhotosListView.swift
 //  MLCodeChallenge
 //
 //  Created by Joaquin Wilson on 8/18/26.

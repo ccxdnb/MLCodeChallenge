@@ -1,5 +1,5 @@
 //
-//  AlbumsListView.swift
+//  AlbumsGridView.swift
 //  MLCodeChallenge
 //
 //  Created by Joaquin Wilson on 8/18/26.
