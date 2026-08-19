@@ -52,6 +52,7 @@ struct UserRowView: View {
                                 .fill(Color.green)
                                 .shadow(color: Color.green.opacity(0.3), radius: 4, x: 0, y: 2)
                         )
+                        .accessibilityLabel("Make call to number")
                 }
                 .buttonStyle(.plain)
             } else {
@@ -63,6 +64,7 @@ struct UserRowView: View {
                         .background(
                             .gray
                         )
+                        .accessibilityLabel("Make call to number")
                 }
                 .buttonStyle(.plain)
             }
@@ -78,6 +80,8 @@ struct UserRowView: View {
                                 .fill(Color.indigo)
                                 .shadow(color: Color.indigo.opacity(0.3), radius: 4, x: 0, y: 2)
                         )
+                        .accessibilityLabel("Send email")
+
                 }
                 .buttonStyle(.plain)
             } else {
@@ -89,6 +93,7 @@ struct UserRowView: View {
                         .background(
                             .gray
                         )
+                        .accessibilityLabel("Send email")
                 }
                 .buttonStyle(.plain)
             }
@@ -105,6 +110,7 @@ struct UserRowView: View {
                             .fill(Color.orange)
                             .shadow(color: Color.orange.opacity(0.3), radius: 4, x: 0, y: 2)
                     )
+                    .accessibilityLabel("Open maps")
             }
             .buttonStyle(.plain)
         }
