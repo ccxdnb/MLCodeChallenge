@@ -24,12 +24,12 @@ final class HTTPClient: HTTPClientProtocol, Sendable {
     private let session: URLSession
     private let decoder: JSONDecoder
 
-    init(session: URLSession = .shared, decoder: JSONDecoder = JSONDecoder()) {
+    nonisolated init(session: URLSession = .shared, decoder: JSONDecoder = JSONDecoder()) {
         self.session = session
         self.decoder = decoder
     }
 
-    func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T {
+    nonisolated func execute<T: Decodable>(_ endpoint: EndpointType) async throws -> T {
         let data = try await perform(endpoint)
 
         do {
@@ -40,13 +40,13 @@ final class HTTPClient: HTTPClientProtocol, Sendable {
         }
     }
 
-    func execute(_ endpoint: EndpointType) async throws {
+    nonisolated func execute(_ endpoint: EndpointType) async throws {
         _ = try await perform(endpoint)
     }
 
     /// Sends the request and validates the response. Returns the raw body so
     /// callers decide whether to decode it or discard it.
-    private func perform(_ endpoint: EndpointType) async throws -> Data {
+    private nonisolated func perform(_ endpoint: EndpointType) async throws -> Data {
         let request = try endpoint.urlRequest()
         logger.debug("→ \(request.httpMethod ?? "") \(request.url?.absoluteString ?? "")")
 
