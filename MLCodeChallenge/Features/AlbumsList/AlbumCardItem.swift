@@ -18,7 +18,7 @@ struct AlbumCardItem: View {
                 CachedAsyncImage(
                     url: photo.thumbnailURL,
                     targetSize: CGSize(width: 250, height: 250),
-                    imageLoader: viewModel.dependencies.imageLoader
+                    imageLoader: viewModel.getImageLoader()
                 ) { image in
                     image
                         .resizable()

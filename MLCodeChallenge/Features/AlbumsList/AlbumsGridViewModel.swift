@@ -20,7 +20,7 @@ final class AlbumsGridViewModel {
     private(set) var state: ViewState<[Album]> = .idle
     private(set) var albumCovers: [Int: Photo] = [:]
 
-    let dependencies: Dependencies
+    private let dependencies: Dependencies
 
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
@@ -33,6 +33,10 @@ final class AlbumsGridViewModel {
 
     func refresh() async {
         await fetch()
+    }
+
+    func getImageLoader() -> ImageLoader {
+        return self.dependencies.imageLoader
     }
 
     private func fetch() async {
