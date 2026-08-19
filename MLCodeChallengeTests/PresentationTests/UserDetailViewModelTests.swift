@@ -2,6 +2,7 @@ import Testing
 import Foundation
 @testable import MLCodeChallenge
 
+@MainActor
 @Suite
 struct UserDetailViewModelTests {
     @Test
@@ -22,6 +23,7 @@ struct UserDetailViewModelTests {
     }
 
     @Test
+
     func exposesUser() {
         let user = User.stub
         let viewModel = makeViewModel(user: user)

@@ -59,7 +59,7 @@ extension AppRootView {
     func destinationFor(_ route: Route) -> some View {
         switch route {
         case .map(let user):
-            UserMapView(user: user)
+            UserMapView(viewModel: factory.makeUserMapViewModel(user: user))
 
         case let .userDetail(user):
             UserDetailView(viewModel: factory.makeUserDetailViewModel(user: user))

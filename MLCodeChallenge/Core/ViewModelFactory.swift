@@ -27,7 +27,7 @@ final class ViewModelFactory {
             albumsService: AlbumsServiceProtocol,
             photosService: PhotosServiceProtocol,
             imageLoader: ImageLoader,
-            coordinator: AppCoordinatorProtocol
+            coordinator: AppCoordinatorProtocol,
         ) {
             self.usersService = usersService
             self.albumsService = albumsService
@@ -81,6 +81,14 @@ final class ViewModelFactory {
         return cached(for: .userDetail(user)) {
             logger.debug("Creating new UserDetailViewModel for user: \(user.id)")
             return UserDetailViewModel(dependencies: .init(coordinator: coordinator, user: user))
+        }
+    }
+
+    func makeUserMapViewModel(user: User) -> UserMapViewModel {
+        logger.debug("makeUserMapViewModel called for user: \(user.id)")
+        return cached(for: .map(user)) {
+            logger.debug("Creating new UserMapViewModel for user: \(user.id)")
+            return UserMapViewModel(dependencies: .init(user: user))
         }
     }
 
