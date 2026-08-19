@@ -1,3 +1,10 @@
+//
+//  PhotosServiceMock.swift
+//  MLCodeChallenge
+//
+//  Created by Joaquin Wilson on 8/17/26.
+//
+
 import Foundation
 @testable import MLCodeChallenge
 

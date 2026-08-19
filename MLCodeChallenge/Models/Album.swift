@@ -1,3 +1,10 @@
+//
+//  Album.swift
+//  MLCodeChallenge
+//
+//  Created by Joaquin Wilson on 8/17/26.
+//
+
 import Foundation
 
 nonisolated struct Album: Decodable, Identifiable, Hashable {

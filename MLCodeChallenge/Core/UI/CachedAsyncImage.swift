@@ -1,3 +1,10 @@
+//
+//  CachedAsyncImage.swift
+//  MLCodeChallenge
+//
+//  Created by Joaquin Wilson on 8/17/26.
+//
+
 import SwiftUI
 
 struct CachedAsyncImage<Content: View, Placeholder: View>: View {
