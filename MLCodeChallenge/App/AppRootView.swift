@@ -13,16 +13,14 @@ private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge"
 struct AppRootView: View {
     @State private var coordinator: AppCoordinator
     @State private var factory: ServiceFactory
-
-    private let imageLoader: ImageLoader
+    @State private var imageLoader: ImageLoader
 
     init(
         client: HTTPClientProtocol
     ) {
         _factory = .init(initialValue: .init(client: client))
-        _coordinator = State(initialValue: AppCoordinator())
-
-        self.imageLoader = .init(cache: ImageCache())
+        _coordinator = .init(initialValue: AppCoordinator())
+        _imageLoader = .init(initialValue: .init(cache: ImageCache()))
     }
 
     var body: some View {

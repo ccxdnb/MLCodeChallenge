@@ -15,6 +15,8 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
 
     @State private var phase: CachedAsyncImagePhase = .empty
 
+    @Environment(\.displayScale) private var displayScale
+
     private let imageLoader: ImageLoader
 
     init(
@@ -55,7 +57,6 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         }
     }
 
-    @MainActor
     private func loadImage() async {
         guard let url = url else {
             phase = .empty
@@ -69,10 +70,8 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             phase = .empty
         }
 
-        let scale = UITraitCollection.current.displayScale
-
         do {
-            let uiImage = try await imageLoader.loadImage(from: url, targetSize: targetSize, scale: scale)
+            let uiImage = try await imageLoader.loadImage(from: url, targetSize: targetSize, scale: displayScale)
 
             guard !Task.isCancelled else { return }
 
