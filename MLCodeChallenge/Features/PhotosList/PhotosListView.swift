@@ -7,13 +7,13 @@
 import SwiftUI
 
 struct PhotosListView: View {
-    @Bindable var viewModel: PhotosListViewModel
+    @State var viewModel: PhotosListViewModel
     let imageLoader: ImageLoader
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    init(viewModel: PhotosListViewModel, imageLoader: ImageLoader) {
-        self.viewModel = viewModel
-        self.imageLoader = imageLoader
+    init(dependencies: PhotosListViewModel.Dependencies) {
+        self.imageLoader = dependencies.imageLoader
+        _viewModel = .init(wrappedValue: .init(dependencies: dependencies))
     }
 
     var body: some View {
@@ -143,12 +143,9 @@ extension PhotosListView {
 
 #Preview {
     let imageLoader = ImageLoader(cache: ImageCache())
-    return PhotosListView(
-        viewModel: .init(dependencies:
+    return PhotosListView(dependencies:
                 .init(photosService: PreviewPhotosService(),
                       imageLoader: imageLoader,
                       albumID: 1)
-        ),
-        imageLoader: imageLoader
     )
 }

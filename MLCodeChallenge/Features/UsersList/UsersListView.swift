@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct UsersListView: View {
-    @Bindable var viewModel: UsersListViewModel
+    @State var viewModel: UsersListViewModel
 
-    init(viewModel: UsersListViewModel) {
-        self.viewModel = viewModel
+    init(dependencies: UsersListViewModel.Dependencies) {
+        _viewModel = .init(wrappedValue: .init(dependencies: dependencies))
     }
 
     var body: some View {
@@ -116,9 +116,9 @@ extension UsersListView {
 
 #Preview {
     UsersListView(
-        viewModel: .init(dependencies:
+        dependencies:
                 .init(usersService: PreviewUsersService(),
-                      coordinator: AppCoordinator())
+                      coordinator: AppCoordinator()
         )
     )
 }

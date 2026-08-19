@@ -7,10 +7,10 @@
 import SwiftUI
 
 struct AlbumsGridView: View {
-    @Bindable var viewModel: AlbumsGridViewModel
+    @State var viewModel: AlbumsGridViewModel
 
-    init(viewModel: AlbumsGridViewModel) {
-        self.viewModel = viewModel
+    init(dependencies: AlbumsGridViewModel.Dependencies) {
+        _viewModel = .init(wrappedValue: .init(dependencies: dependencies))
     }
 
     var body: some View {
@@ -84,13 +84,12 @@ extension AlbumsGridView {
 }
 
 #Preview {
-    AlbumsGridView(
-        viewModel: .init(dependencies:
+    AlbumsGridView(dependencies:
                 .init(albumsService: PreviewAlbumsService(),
                       photosService: PreviewPhotosService(),
                       imageLoader: ImageLoader(cache: ImageCache()),
                       coordinator: AppCoordinator(),
                       userID: 1)
+
         )
-    )
 }

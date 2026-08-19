@@ -10,8 +10,12 @@ import GoogleMaps
 import CoreLocation
 
 struct UserMapView: View {
-    @Bindable var viewModel: UserMapViewModel
+    @State var viewModel: UserMapViewModel
     @State private var recenterTrigger = false
+
+    init(dependencies: UserMapViewModel.Dependencies) {
+        _viewModel = .init(wrappedValue: .init(dependencies: dependencies))
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -122,10 +126,9 @@ struct UserMapView: View {
 
 #Preview {
     NavigationStack {
-        UserMapView(
-            viewModel: .init(dependencies: .init(
+        UserMapView(dependencies: .init(
                 user: .stub
-            ))
+            )
         )
     }
 }

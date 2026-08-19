@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct UserDetailView: View {
-    @Bindable var viewModel: UserDetailViewModel
+    @State var viewModel: UserDetailViewModel
 
-    init(viewModel: UserDetailViewModel) {
-        self.viewModel = viewModel
+    init(dependencies: UserDetailViewModel.Dependencies) {
+        _viewModel = .init(wrappedValue: .init(dependencies: dependencies))
     }
 
     var body: some View {
@@ -149,10 +149,9 @@ private struct DetailRow: View {
 }
 
 #Preview {
-    UserDetailView(
-        viewModel: .init(dependencies: .init(
+    UserDetailView(dependencies: .init(
             coordinator: AppCoordinator(),
             user: .stub
-        ))
+        )
     )
 }

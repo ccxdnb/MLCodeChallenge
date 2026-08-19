@@ -12,37 +12,30 @@ private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge"
 
 struct AppRootView: View {
     @State private var coordinator: AppCoordinator
-    @State private var factory: ViewModelFactory
+    @State private var factory: ServiceFactory
+
     private let imageLoader: ImageLoader
 
     init(
-        usersService: UsersServiceProtocol,
-        albumsService: AlbumsServiceProtocol,
-        photosService: PhotosServiceProtocol,
-        imageLoader: ImageLoader
+        client: HTTPClientProtocol
     ) {
-        let coordinator = AppCoordinator()
-        _coordinator = State(initialValue: coordinator)
-        _factory = State(initialValue: ViewModelFactory(
-            usersService: usersService,
-            albumsService: albumsService,
-            photosService: photosService,
-            imageLoader: imageLoader,
-            coordinator: coordinator
-        ))
-        self.imageLoader = imageLoader
+        _factory = .init(initialValue: .init(client: client))
+        _coordinator = State(initialValue: AppCoordinator())
+
+        self.imageLoader = .init(cache: ImageCache())
     }
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            UsersListView(viewModel: factory.makeUsersListViewModel())
-                .navigationDestination(for: Route.self) { route in
-                    self.destinationFor(route)
-                }
+            UsersListView(dependencies: .init(
+                usersService: self.factory.usersService,
+                coordinator: self.coordinator)
+            )
+            .navigationDestination(for: Route.self) { route in
+                self.destinationFor(route)
+            }
         }
-        .onChange(of: coordinator.path) { _, newPath in
-            factory.prune(keeping: newPath)
-        }
+
         .onReceive(NotificationCenter.default.publisher(
             for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
                 logger.debug("Memory warning received via NotificationCenter!")
@@ -59,18 +52,25 @@ extension AppRootView {
     func destinationFor(_ route: Route) -> some View {
         switch route {
         case .map(let user):
-            UserMapView(viewModel: factory.makeUserMapViewModel(user: user))
+            UserMapView(dependencies: .init(user: user))
 
         case let .userDetail(user):
-            UserDetailView(viewModel: factory.makeUserDetailViewModel(user: user))
+            UserDetailView(dependencies: .init(coordinator: coordinator, user: user))
 
         case .albums(let user):
-            AlbumsGridView(viewModel: factory.makeAlbumsListViewModel(user: user))
+            AlbumsGridView(dependencies: .init(
+                albumsService: self.factory.albumsService,
+                photosService: self.factory.photosService,
+                imageLoader: self.imageLoader,
+                coordinator: self.coordinator,
+                userID: user.id))
 
         case .photos(let album):
-            PhotosListView(
-                viewModel: factory.makePhotosListViewModel(album: album),
-                imageLoader: imageLoader
+            PhotosListView(dependencies: .init(
+                photosService: self.factory.photosService,
+                imageLoader: self.imageLoader,
+                albumID: album.id)
+
             )
         }
     }
@@ -78,10 +78,5 @@ extension AppRootView {
 
 #Preview {
     let client = HTTPClient()
-    return AppRootView(
-        usersService: UsersService(client: client),
-        albumsService: AlbumsService(client: client),
-        photosService: PhotosService(client: client),
-        imageLoader: ImageLoader(cache: ImageCache())
-    )
+    return AppRootView(client: client)
 }
