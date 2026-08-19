@@ -11,7 +11,7 @@ protocol UsersServiceProtocol {
     func deleteUser(userId: Int) async throws
 }
 
-final class UsersService: UsersServiceProtocol, Sendable {
+final class UsersService: UsersServiceProtocol {
     private let client: HTTPClientProtocol
 
     init(client: HTTPClientProtocol) {

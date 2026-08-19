@@ -77,6 +77,7 @@ actor ImageLoader {
         return await Self.downsampleAndDecode(image, targetSize: targetSize, scale: scale)
     }
 
+    @concurrent
     private nonisolated static func downsampleAndDecode(_ image: UIImage, targetSize: CGSize, scale: CGFloat) async -> UIImage {
         let pixelSize = CGSize(
             width: targetSize.width * scale,

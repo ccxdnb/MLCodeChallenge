@@ -11,7 +11,7 @@ protocol PhotosServiceProtocol {
     func photos(albumID: Int, page: Int, limit: Int) async throws -> [Photo]
 }
 
-final class PhotosService: PhotosServiceProtocol, Sendable {
+final class PhotosService: PhotosServiceProtocol {
     private let client: HTTPClientProtocol
 
     init(client: HTTPClientProtocol) {

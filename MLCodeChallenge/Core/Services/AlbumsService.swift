@@ -11,7 +11,7 @@ protocol AlbumsServiceProtocol {
     func albums(userID: Int) async throws -> [Album]
 }
 
-final class AlbumsService: AlbumsServiceProtocol, Sendable {
+final class AlbumsService: AlbumsServiceProtocol {
     private let client: HTTPClientProtocol
 
     init(client: HTTPClientProtocol) {
