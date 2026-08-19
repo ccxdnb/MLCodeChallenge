@@ -26,20 +26,20 @@ actor ImageLoader {
     func loadImage(from url: URL, targetSize: CGSize, scale: CGFloat) async throws -> UIImage {
         let cacheKey = cacheKey(url: url, size: targetSize, scale: scale)
 
-        if let decoded = await cache.decodedImage(for: cacheKey) {
+        if let decoded = cache.decodedImage(for: cacheKey) {
             return decoded
         }
 
-        if let compressed = await cache.compressedImage(for: url.absoluteString) {
+        if let compressed = cache.compressedImage(for: url.absoluteString) {
             let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
-            await cache.setDecoded(decoded, for: cacheKey)
+            cache.setDecoded(decoded, for: cacheKey)
             return decoded
         }
 
         if let existingTask = inFlightTasks[url.absoluteString] {
             let compressed = try await existingTask.value
             let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
-            await cache.setDecoded(decoded, for: cacheKey)
+            cache.setDecoded(decoded, for: cacheKey)
             return decoded
         }
 
@@ -57,10 +57,10 @@ actor ImageLoader {
             let compressed = try await task.value
             inFlightTasks.removeValue(forKey: url.absoluteString)
 
-            await cache.setCompressed(compressed, for: url.absoluteString)
+            cache.setCompressed(compressed, for: url.absoluteString)
 
             let decoded = await decode(compressed, targetSize: targetSize, scale: scale)
-            await cache.setDecoded(decoded, for: cacheKey)
+            cache.setDecoded(decoded, for: cacheKey)
 
             return decoded
         } catch {
@@ -114,13 +114,13 @@ actor ImageLoader {
     }
 
     func removeAll() async {
-        await cache.clear()
+        cache.clear()
         inFlightTasks.values.forEach { $0.cancel() }
         inFlightTasks.removeAll()
     }
 
     func removeAllDecoded() async {
-        await cache.clearDecoded()
+        cache.clearDecoded()
     }
 }
 
