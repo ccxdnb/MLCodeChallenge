@@ -36,7 +36,7 @@ struct PhotoTests {
             thumbnailUrl: "https://via.placeholder.com/150/92c952"
         )
 
-        let expectedURL = URL(string: "https://picsum.photos/seed/photo-42/200/200")!
+        let expectedURL = URL(string: "https://picsum.photos/seed/photo-42/150/150")!
         #expect(photo.thumbnailURL == expectedURL)
     }
 

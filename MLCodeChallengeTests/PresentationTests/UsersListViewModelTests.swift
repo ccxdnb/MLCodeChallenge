@@ -114,7 +114,7 @@ struct UsersListViewModelTests {
         let response = makeSUT(result: .success([]))
         let user = User.stub
 
-        response.usersListViewModel.didSelect(user)
+        response.usersListViewModel.showDetail(for: user)
 
         #expect(response.appCoordinatorSpy.pushToCalls.count == 1)
         #expect(response.appCoordinatorSpy.pushToCalls.first == .userDetail(user))

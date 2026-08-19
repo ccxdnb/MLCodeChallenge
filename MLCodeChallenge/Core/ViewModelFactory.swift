@@ -63,7 +63,7 @@ final class ViewModelFactory {
         return viewModel
     }
 
-    func makePhotosGridViewModel(album: Album) -> PhotosListViewModel {
+    func makePhotosListViewModel(album: Album) -> PhotosListViewModel {
         if let existing = photosGridViewModels[album.id] {
             return existing
         }

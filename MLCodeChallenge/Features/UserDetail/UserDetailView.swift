@@ -23,6 +23,7 @@ struct UserDetailView: View {
                     addressSection
                     albumsButton
                 }
+                .readableContentWidth()
                 .padding()
             }
             .appBackground()

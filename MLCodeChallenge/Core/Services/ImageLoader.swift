@@ -105,13 +105,13 @@ actor ImageLoader {
         return decodedImage
     }
 
-    func flush() async {
+    func removeAll() async {
         await cache.clear()
         inFlightTasks.values.forEach { $0.cancel() }
         inFlightTasks.removeAll()
     }
 
-    func flushDecoded() async {
+    func removeAllDecoded() async {
         await cache.clearDecoded()
     }
 }

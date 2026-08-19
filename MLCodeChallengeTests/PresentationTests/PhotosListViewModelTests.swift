@@ -7,7 +7,7 @@ import Foundation
 struct PhotosListViewModelTests {
     @Test
     func loadInitialSuccess() async {
-        let photos = makePhotos(count: 20)
+        let photos = makePhotos(count: 28)
         let service = PhotosServiceMock()
         service.result = .success(photos)
 
@@ -27,7 +27,7 @@ struct PhotosListViewModelTests {
         #expect(service.callCount == 1)
         #expect(service.lastAlbumID == 1)
         #expect(service.lastPage == 1)
-        #expect(service.lastLimit == 20)
+        #expect(service.lastLimit == 28)
     }
 
     @Test
@@ -81,8 +81,8 @@ struct PhotosListViewModelTests {
 
     @Test
     func loadNextPageAppendsPhotos() async {
-        let firstPage = makePhotos(count: 20, startID: 1)
-        let secondPage = makePhotos(count: 20, startID: 21)
+        let firstPage = makePhotos(count: 28, startID: 1)
+        let secondPage = makePhotos(count: 28, startID: 29)
 
         let service = PhotosServiceMock()
         service.result = .success(firstPage)
@@ -92,15 +92,14 @@ struct PhotosListViewModelTests {
 
         service.result = .success(secondPage)
         viewModel.loadNextPageIfNeeded()
-
-        try? await Task.sleep(for: .milliseconds(100))
+        await viewModel.waitForPaginationToComplete()
 
         guard case .loaded(let state) = viewModel.state else {
             Issue.record("Expected .loaded state")
             return
         }
 
-        #expect(state.photos.count == 40)
+        #expect(state.photos.count == 56)
         #expect(state.photos == firstPage + secondPage)
         #expect(state.currentPage == 2)
         #expect(service.callCount == 2)
@@ -234,8 +233,8 @@ struct PhotosListViewModelTests {
         // immediate succession does not trigger duplicate page loads.
         // The guard should be effective before any suspension point.
 
-        let firstPage = makePhotos(count: 20, startID: 1)
-        let secondPage = makePhotos(count: 20, startID: 21)
+        let firstPage = makePhotos(count: 28, startID: 1)
+        let secondPage = makePhotos(count: 28, startID: 29)
 
         // Use a slow mock to simulate network delay and create a race window
         let slowService = SlowPhotosServiceMock(
@@ -254,8 +253,8 @@ struct PhotosListViewModelTests {
         viewModel.loadNextPageIfNeeded()
         viewModel.loadNextPageIfNeeded()
 
-        // Wait for the async operations to complete
-        try? await Task.sleep(for: .milliseconds(200))
+        // Wait for the pagination to complete
+        await viewModel.waitForPaginationToComplete()
 
         // The service should have been called exactly twice total:
         // once for initial load, once for pagination (not twice for pagination)
@@ -266,8 +265,8 @@ struct PhotosListViewModelTests {
             return
         }
 
-        // Should have exactly 40 photos (20 from initial + 20 from one page load)
-        #expect(state.photos.count == 40)
+        // Should have exactly 56 photos (28 from initial + 28 from one page load)
+        #expect(state.photos.count == 56)
         #expect(state.currentPage == 2)
     }
 
@@ -276,8 +275,8 @@ struct PhotosListViewModelTests {
         // This test verifies that refresh keeps the current photos visible
         // until the new page arrives, preventing the list from going empty
 
-        let originalPhotos = makePhotos(count: 20, startID: 1)
-        let refreshedPhotos = makePhotos(count: 20, startID: 100)
+        let originalPhotos = makePhotos(count: 28, startID: 1)
+        let refreshedPhotos = makePhotos(count: 28, startID: 100)
 
         // Use a slow mock to simulate network delay during refresh
         let slowService = SlowPhotosServiceMock(

@@ -23,7 +23,7 @@ nonisolated struct Photo: Decodable, Identifiable, Hashable {
     }
 
     var bannerURL: URL {
-        ImageHost.base.appending(path: "seed/photo-\(id)/533/300")
+        ImageHost.base.appending(path: "seed/photo-\(id)/400/400")
     }
 
     var fullSizeURL: URL {

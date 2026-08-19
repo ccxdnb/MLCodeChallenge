@@ -88,12 +88,15 @@ extension UsersListView {
     private func userListView(users: [User]) -> some View {
         List {
             ForEach(users) { user in
-                UserRowView(user: user) {
-                    viewModel.didTapMapIcon(user)
+                Button {
+                    viewModel.showDetail(for: user)
+                } label: {
+                    UserRowView(user: user) {
+                        viewModel.showMap(for: user)
+                    }
                 }
-                .onTapGesture {
-                    viewModel.didSelect(user)
-                }
+                .buttonStyle(.plain)
+                .readableContentWidth()
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)

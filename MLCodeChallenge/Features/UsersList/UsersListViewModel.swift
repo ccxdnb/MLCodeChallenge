@@ -57,11 +57,11 @@ final class UsersListViewModel {
         }
     }
 
-    func didTapMapIcon(_ user: User) {
+    func showMap(for user: User) {
         dependencies.coordinator.pushTo(.map(user))
     }
 
-    func didSelect(_ user: User) {
+    func showDetail(for user: User) {
         dependencies.coordinator.pushTo(.userDetail(user))
     }
 

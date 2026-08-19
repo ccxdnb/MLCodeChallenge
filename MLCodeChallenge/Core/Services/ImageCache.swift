@@ -3,7 +3,7 @@ import UIKit
 /// Thread-safe image cache wrapping NSCache.
 /// @unchecked Sendable is justified because NSCache is documented as thread-safe,
 /// though it doesn't conform to Sendable in the SDK.
-actor ImageCache: @unchecked Sendable {
+final class ImageCache: @unchecked Sendable {
     private let compressedCache = NSCache<NSString, UIImage>()
     private let decodedCache = NSCache<NSString, UIImage>()
 

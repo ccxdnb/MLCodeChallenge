@@ -62,8 +62,7 @@ extension AlbumsGridView {
     private func albumsList(_ albums: [Album]) -> some View {
         ScrollView {
             LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 12),
-                GridItem(.flexible(), spacing: 12)
+                GridItem(.adaptive(minimum: 150, maximum: 250), spacing: 12)
             ], spacing: 12) {
                 ForEach(Array(albums.enumerated()), id: \.element.id) { index, album in
                     AlbumCardItem(
@@ -78,6 +77,7 @@ extension AlbumsGridView {
                     .animation(.smooth(duration: 0.25).delay(Double(index) * 0.05), value: viewModel.albumCovers[album.id])
                 }
             }
+            .readableContentWidth()
             .padding(16)
         }
     }

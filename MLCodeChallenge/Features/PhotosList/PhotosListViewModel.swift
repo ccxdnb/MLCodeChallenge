@@ -27,7 +27,7 @@ final class PhotosListViewModel {
     private var initialLoadTask: Task<Void, Never>?
     private var paginationTask: Task<Void, Never>?
     private let dependencies: Dependencies
-    private let pageSize = 20
+    private let pageSize = 28
 
     var selectedPhoto: Photo?
 
@@ -91,6 +91,11 @@ final class PhotosListViewModel {
         paginationTask = Task {
             await fetchPage(nextPage)
         }
+    }
+
+    // For testing: await completion of pagination task
+    func waitForPaginationToComplete() async {
+        await paginationTask?.value
     }
 
     private func fetchPage(_ page: Int) async {

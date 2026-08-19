@@ -11,9 +11,8 @@ import OSLog
 private nonisolated let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge", category: "AppRootView")
 
 struct AppRootView: View {
-    @State private var coordinator = AppCoordinator()
+    @State private var coordinator: AppCoordinator
     @State private var factory: ViewModelFactory
-    @State private var showClearCacheConfirmation = false
     private let imageLoader: ImageLoader
 
     init(
@@ -41,24 +40,11 @@ struct AppRootView: View {
                     self.destinationFor(route)
                 }
         }
-        .onShake {
-            showClearCacheConfirmation = true
-        }
-        .alert("Clear Image Cache", isPresented: $showClearCacheConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Clear", role: .destructive) {
-                Task {
-                    await imageLoader.flush()
-                }
-            }
-        } message: {
-            Text("Are you sure you want to clear the image cache? This will remove all cached images.")
-        }
         .onReceive(NotificationCenter.default.publisher(
             for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
                 logger.debug("Memory warning received via NotificationCenter!")
                 Task {
-                    await imageLoader.flush()
+                    await imageLoader.removeAll()
                 }
                 URLCache.shared.removeAllCachedResponses()
         }
@@ -80,7 +66,7 @@ extension AppRootView {
 
         case .photos(let album):
             PhotosListView(
-                viewModel: factory.makePhotosGridViewModel(album: album),
+                viewModel: factory.makePhotosListViewModel(album: album),
                 imageLoader: imageLoader
             )
         }

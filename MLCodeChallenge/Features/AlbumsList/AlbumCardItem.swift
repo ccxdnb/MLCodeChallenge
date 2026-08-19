@@ -17,7 +17,7 @@ struct AlbumCardItem: View {
             if let photo = coverPhoto {
                 CachedAsyncImage(
                     url: photo.thumbnailURL,
-                    targetSize: CGSize(width: 150, height: 150),
+                    targetSize: CGSize(width: 250, height: 250),
                     imageLoader: viewModel.dependencies.imageLoader
                 ) { image in
                     image

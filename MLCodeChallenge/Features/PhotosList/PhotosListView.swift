@@ -9,6 +9,7 @@ import SwiftUI
 struct PhotosListView: View {
     @Bindable var viewModel: PhotosListViewModel
     let imageLoader: ImageLoader
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     init(viewModel: PhotosListViewModel, imageLoader: ImageLoader) {
         self.viewModel = viewModel
@@ -25,7 +26,7 @@ struct PhotosListView: View {
                 }
             }
             .refreshable { await viewModel.refresh() }
-            .sheet(item: $viewModel.selectedPhoto) { photo in
+            .fullScreenCover(item: $viewModel.selectedPhoto) { photo in
                 FullscreenPhotoView(
                     photo: photo,
                     imageLoader: imageLoader,
@@ -70,26 +71,72 @@ extension PhotosListView {
     @ViewBuilder
     private func photosGrid(_ paginationState: PhotosListViewModel.PaginationState) -> some View {
         ScrollView {
-            LazyVStack(spacing: 0) {
-                ForEach(paginationState.photos) { photo in
-                    PhotoRow(
+            LazyVGrid(columns: gridColumns, spacing: 8) {
+                ForEach(Array(paginationState.photos.enumerated()), id: \.element.id) { index, photo in
+                    PhotoGridCell(
                         photo: photo,
                         imageLoader: imageLoader,
                         onTap: { viewModel.didSelectPhoto(photo) }
                     )
                     .onAppear {
-                        if photo.id == paginationState.photos.last?.id {
-                            viewModel.loadNextPageIfNeeded()
-                        }
+                        prefetchNearbyPhotos(currentIndex: index, photos: paginationState.photos)
+                    }
+                }
+
+                if !paginationState.hasReachedEnd {
+                    GridRow {
+                        Color.clear
+                            .frame(height: 20)
+                            .gridCellColumns(gridColumns.count)
+                            .onAppear {
+                                viewModel.loadNextPageIfNeeded()
+                            }
                     }
                 }
 
                 if paginationState.isLoadingMore {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                        .padding()
+                    GridRow {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .gridCellColumns(gridColumns.count)
+                            .padding()
+                    }
                 }
             }
+            .readableContentWidth()
+            .padding(16)
+        }
+    }
+
+    /// Prefetch some images ahead of the current visible photo
+    private func prefetchNearbyPhotos(currentIndex: Int, photos: [Photo]) {
+        let prefetchCount = horizontalSizeClass == .compact ? 5 : 12
+
+        let startIndex = currentIndex + 1
+        let endIndex = min(currentIndex + prefetchCount, photos.count - 1)
+
+        guard startIndex <= endIndex else { return }
+
+        for currentIndex in startIndex...endIndex {
+            let photo = photos[currentIndex]
+            Task {
+                // Prefetch at the same size used for display
+                _ = try? await imageLoader.loadImage(
+                    from: photo.bannerURL,
+                    targetSize: CGSize(width: 400, height: 400),
+                    scale: 1.0
+                )
+            }
+        }
+    }
+
+    private var gridColumns: [GridItem] {
+        if horizontalSizeClass == .compact {
+            // iPhone: 1 column
+            [GridItem(.flexible(), spacing: 8)]
+        } else {
+            // iPad: adaptive columns
+            [GridItem(.adaptive(minimum: 150, maximum: 400), spacing: 8)]
         }
     }
 }

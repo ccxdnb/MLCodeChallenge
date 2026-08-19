@@ -129,8 +129,8 @@ struct ImageLoaderTests {
         }
     }
 
-    @Test("flush clears cache and cancels in-flight tasks")
-    func flushClearsCacheAndCancelsTasks() async throws {
+    @Test("removeAll clears cache and cancels in-flight tasks")
+    func removeAllClearsCacheAndCancelsTasks() async throws {
         let cache = ImageCache()
         let mockSession = MockURLSession()
         let loader = ImageLoader(cache: cache, session: mockSession)
@@ -144,13 +144,13 @@ struct ImageLoaderTests {
 
         #expect(cache.compressedImage(for: url.absoluteString) != nil)
 
-        await loader.flush()
+        await loader.removeAll()
 
         #expect(cache.compressedImage(for: url.absoluteString) == nil)
     }
 
-    @Test("flushDecoded clears only decoded cache")
-    func flushDecodedClearsOnlyDecodedCache() async throws {
+    @Test("removeAllDecoded clears only decoded cache")
+    func removeAllDecodedClearsOnlyDecodedCache() async throws {
         let cache = ImageCache()
         let mockSession = MockURLSession()
         let loader = ImageLoader(cache: cache, session: mockSession)
@@ -162,7 +162,7 @@ struct ImageLoaderTests {
 
         _ = try await loader.loadImage(from: url, targetSize: targetSize, scale: 1.0)
 
-        await loader.flushDecoded()
+        await loader.removeAllDecoded()
 
         #expect(cache.compressedImage(for: url.absoluteString) != nil)
     }
