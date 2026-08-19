@@ -6,7 +6,11 @@
 //
 
 import Foundation
+import OSLog
 
+private let logger = Logger(subsystem: "com.jwilson.MLCodeChallenge", category: "ViewModelFactory")
+
+@MainActor
 final class ViewModelFactory {
     private let usersService: UsersServiceProtocol
     private let albumsService: AlbumsServiceProtocol
@@ -14,30 +18,31 @@ final class ViewModelFactory {
     private let imageLoader: ImageLoader
     private let coordinator: AppCoordinatorProtocol
 
+    /// The root view model lives outside the route cache
     private var usersListViewModel: UsersListViewModel?
-    private var albumsListViewModels: [Int: AlbumsGridViewModel] = [:]
-    private var photosGridViewModels: [Int: PhotosListViewModel] = [:]
-    private var userDetailViewModels: [Int: UserDetailViewModel] = [:]
+    private var routeViewModels: [Route.ID: AnyObject] = [:]
 
-    init(
-        usersService: UsersServiceProtocol,
-        albumsService: AlbumsServiceProtocol,
-        photosService: PhotosServiceProtocol,
-        imageLoader: ImageLoader,
-        coordinator: AppCoordinatorProtocol
-    ) {
-        self.usersService = usersService
-        self.albumsService = albumsService
-        self.photosService = photosService
-        self.imageLoader = imageLoader
-        self.coordinator = coordinator
-    }
+        init(
+            usersService: UsersServiceProtocol,
+            albumsService: AlbumsServiceProtocol,
+            photosService: PhotosServiceProtocol,
+            imageLoader: ImageLoader,
+            coordinator: AppCoordinatorProtocol
+        ) {
+            self.usersService = usersService
+            self.albumsService = albumsService
+            self.photosService = photosService
+            self.imageLoader = imageLoader
+            self.coordinator = coordinator
+            logger.debug("ViewModelFactory initialized")
+        }
 
     func makeUsersListViewModel() -> UsersListViewModel {
         if let existing = usersListViewModel {
+            logger.debug("Returning cached UsersListViewModel")
             return existing
         }
-
+        logger.debug("Creating new UsersListViewModel")
         let viewModel = UsersListViewModel(
             dependencies: .init(usersService: usersService, coordinator: coordinator)
         )
@@ -45,49 +50,66 @@ final class ViewModelFactory {
         return viewModel
     }
 
-    func makeAlbumsListViewModel(userID: Int) -> AlbumsGridViewModel {
-        if let existing = albumsListViewModels[userID] {
-            return existing
-        }
-
-        let viewModel = AlbumsGridViewModel(
-            dependencies: .init(
+    func makeAlbumsListViewModel(user: User) -> AlbumsGridViewModel {
+        logger.debug("makeAlbumsListViewModel called for user: \(user.id)")
+        return cached(for: .albums(user)) {
+            logger.debug("Creating new AlbumsGridViewModel for user: \(user.id)")
+            return AlbumsGridViewModel(dependencies: .init(
                 albumsService: albumsService,
                 photosService: photosService,
                 imageLoader: imageLoader,
                 coordinator: coordinator,
-                userID: userID
-            )
-        )
-        albumsListViewModels[userID] = viewModel
-        return viewModel
+                userID: user.id
+            ))
+        }
     }
 
     func makePhotosListViewModel(album: Album) -> PhotosListViewModel {
-        if let existing = photosGridViewModels[album.id] {
-            return existing
-        }
-
-        let viewModel = PhotosListViewModel(
-            dependencies: .init(
+        logger.debug("makePhotosListViewModel called for album: \(album.id)")
+        return cached(for: .photos(album)) {
+            logger.debug("Creating new PhotosListViewModel for album: \(album.id)")
+            return PhotosListViewModel(dependencies: .init(
                 photosService: photosService,
                 imageLoader: imageLoader,
                 albumID: album.id
-            )
-        )
-        photosGridViewModels[album.id] = viewModel
-        return viewModel
+            ))
+        }
     }
 
     func makeUserDetailViewModel(user: User) -> UserDetailViewModel {
-        if let existing = userDetailViewModels[user.id] {
+        logger.debug("makeUserDetailViewModel called for user: \(user.id)")
+        return cached(for: .userDetail(user)) {
+            logger.debug("Creating new UserDetailViewModel for user: \(user.id)")
+            return UserDetailViewModel(dependencies: .init(coordinator: coordinator, user: user))
+        }
+    }
+
+    /// Discards the view models whose route is no longer on the navigation stack
+    func prune(keeping path: [Route]) {
+        let live = Set(path.map(\.id))
+        let beforeCount = routeViewModels.count
+        routeViewModels = routeViewModels.filter { live.contains($0.key) }
+        let afterCount = routeViewModels.count
+        let pruned = beforeCount - afterCount
+
+        if pruned > 0 {
+            logger.debug("Pruned \(pruned) view models. Cache size: \(beforeCount) -> \(afterCount)")
+        }
+    }
+
+    private func cached<ViewModel: AnyObject>(
+        for route: Route,
+        make: () -> ViewModel
+    ) -> ViewModel {
+        if let existing = routeViewModels[route.id] as? ViewModel {
+            logger.debug("Returning cached view model for route: \(route.id)")
             return existing
         }
 
-        let viewModel = UserDetailViewModel(
-            dependencies: .init(coordinator: coordinator, user: user)
-        )
-        userDetailViewModels[user.id] = viewModel
+        logger.debug("Cache miss for route: \(route.id), creating new view model")
+        let viewModel = make()
+        routeViewModels[route.id] = viewModel
+        logger.debug("Cached view model for route: \(route.id). Total cached: \(self.routeViewModels.count)")
         return viewModel
     }
 }

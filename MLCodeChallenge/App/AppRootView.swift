@@ -40,6 +40,9 @@ struct AppRootView: View {
                     self.destinationFor(route)
                 }
         }
+        .onChange(of: coordinator.path) { _, newPath in
+            factory.prune(keeping: newPath)
+        }
         .onReceive(NotificationCenter.default.publisher(
             for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
                 logger.debug("Memory warning received via NotificationCenter!")
@@ -62,7 +65,7 @@ extension AppRootView {
             UserDetailView(viewModel: factory.makeUserDetailViewModel(user: user))
 
         case .albums(let user):
-            AlbumsGridView(viewModel: factory.makeAlbumsListViewModel(userID: user.id))
+            AlbumsGridView(viewModel: factory.makeAlbumsListViewModel(user: user))
 
         case .photos(let album):
             PhotosListView(
