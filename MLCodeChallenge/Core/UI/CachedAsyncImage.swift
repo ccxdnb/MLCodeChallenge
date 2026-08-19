@@ -32,7 +32,13 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             case .success(let image):
                 content(image)
             case .failure:
-                placeholder()
+                Rectangle()
+                    .fill(Color(.systemGray5))
+                    .overlay {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.largeTitle)
+                    }
             @unknown default:
                 placeholder()
             }
