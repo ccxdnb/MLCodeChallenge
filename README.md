@@ -22,12 +22,12 @@ Razones las cuales se explican luego en este documento.
 
 ## Screenshots
 
-| Usuarios                                                                                                                                  | Mapa                                                                                                                          | Detalle                                                                                                                                      |
-| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Usuarios                                                                              | Mapa                                                                      | Detalle                                                                                  |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | <img src="Demo%20Images/UserListView.png?raw=true" width="300" alt="Users List View"> | <img src="Demo%20Images/MapView.png?raw=true" width="300" alt="Map View"> | <img src="Demo%20Images/UserDetailView.png?raw=true" width="300" alt="User Detail View"> |
 
-| Albumes                                                                                                                                    | Fotos                                                                                                                                       | Pantalla Completa                                                                                                                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Albumes                                                                                | Fotos                                                                                   | Pantalla Completa                                                                           |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | <img src="Demo%20Images/AlbumListView.png?raw=true" width="300" alt="Album List View"> | <img src="Demo%20Images/PhotoListView.png?raw=true" width="300" alt="Photos List View"> | <img src="Demo%20Images/FullSizePhotoView.png?raw=true" width="300" alt="Full Screen View"> |
 
 ---
@@ -105,7 +105,7 @@ Tambien considere una implementacion por composicion de protocolos:
 typealias Dependencies = HasUsersService & HasCoordinator
 ```
 
-La cual permite una mayor escalabilidad a medida que va creciento pero considero que para un challenge de 5 pantallas es infrastructura que no va a ser utilizada.
+La cual permite una mayor escalabilidad a medida que va creciendo pero considero que para un challenge de 5 pantallas es infrastructura que no va a ser utilizada.
 
 El proposito de `ServiceFactory` es poder tener un punto de composicion que le permita a los ViewModels sobrevivir a las re-evaluaciones de las vistas de SwiftUI de forma tal que no creen nuevos servicios por cada evaluacion.
 
@@ -133,7 +133,7 @@ Considero que el alcance del proyecto define la arquitectura y que en este caso 
 
 ### Por qué un coordinator plano
 
-En SwiftUI tenemos un NavigationStack que solo tiene un unico path, si bien aplicar child-coordinators es posible lo que sucede es que como no pueden tener un stack independiente (como en UIKit) no son realmente necesarios ya que se soluciona la navegacion estableciendo una jerarqua de rutas por features (usando sub-enums).
+En SwiftUI tenemos un NavigationStack que solo tiene un unico path, si bien aplicar child-coordinators es posible lo que sucede es que como no pueden tener un stack independiente (como en UIKit) no son realmente necesarios ya que se soluciona la navegacion estableciendo una jerarquia de rutas por features (usando sub-enums).
 Ejemplo:
 
 ```swift
@@ -172,7 +172,7 @@ Esto es parte de una decision conciente de proteger los estados de data races y 
 
 - `HTTPClient`: Esta definido como final class y sendable ya que unicamente tiene propiedades LET y no precisa de proteccion de mutacion de estados
 
-- `ImageLoader`: Esta definido como `actor` ya que almacena un diccionaro de `Tasks` las cuales y la logica de chekeo para prevenir duplicacion de request de una misma imagen que se realiza desde distintos componentes.
+- `ImageLoader`: Esta definido como `actor` ya que almacena un diccionario de `Tasks` las cuales y la logica de chekeo para prevenir duplicacion de request de una misma imagen que se realiza desde distintos componentes.
 
 - `ImageCache`: Esta definido como `final class` y con el polemico `@unchecked Sendable` ya que segun la documentacion de apple NSCache es thread safe pero aun no conforma con el protocolo `Sendable` por lo tanto no hace falta transformarlo en un `actor` porque ya esta protegido.
 
@@ -181,6 +181,7 @@ Decidi no propagar `URLError.canceled` ya que usualmente no es un error que el u
 ### Paginación
 
 En este caso la paginacion esta dentro del estado .loaded ya que "no podemos paginar datos que no existen" y en caso de que hubieran otros estados que si tengan se podria extraer a un protocolo.
+El view model expone `waitForPaginationToComplete()` como utilidad de testeo para poder await de la Task de paginación de forma deterministica.
 
 Me encontre con 2 bugs de concurrencia:
 
@@ -212,7 +213,7 @@ La api key esta comiteada en el proyecto por la siguiente razon fundamental:
 
 - la Key viaja dentro del binario y cualquiera puede sacarla de un IPA, no es necesario esconderla.
 
-- La proteccion real viene por reestriccion de `BundleID` y limitada al SDK. No hay otra persona que pueda usar esta key porque esta asociada a mi `BundleID` los cuales son unicos en apple.
+- La proteccion real viene por restriccion de `BundleID` y limitada al SDK. No hay otra persona que pueda usar esta key porque esta asociada a mi `BundleID` los cuales son unicos en apple.
 
 - En un proyecto que requiera distintos entornos esta key iria por fuera del control de versiones expuesto por `info.plist`
 

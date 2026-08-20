@@ -120,7 +120,6 @@ extension PhotosListView {
         for currentIndex in startIndex...endIndex {
             let photo = photos[currentIndex]
             Task {
-                // Prefetch at the same size used for display
                 _ = try? await imageLoader.loadImage(
                     from: photo.bannerURL,
                     targetSize: CGSize(width: 400, height: 400),
